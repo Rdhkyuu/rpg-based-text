@@ -1,162 +1,197 @@
 #include <iostream>
 #include <string>
-#include <cstdlib>  // Untuk random dan getenv
-#include <ctime>    // Untuk waktu (seed random)
-#include <windows.h> // Untuk Sleep() dan manipulasi warna console (Windows only)
+#include <cstdlib> // Random & getenv
+#include <ctime>   // Time seed
+#include <windows.h> // warnaa cmd
 
 using namespace std;
 
-// --- UTILITIES (Fungsi Bantuan) ---
+// --- UTILITIES ---
 
-// Fungsi untuk membuat jeda (dalam milidetik)
-void delay(int milliseconds) {
-    Sleep(milliseconds);
+void delay(int ms) {
+    Sleep(ms);
 }
 
-// Fungsi untuk efek mengetik lambat (Horror Vibe)
-void slowPrint(string text, int speed = 50) {
+// Fungsi Warna 
+void aturWarna(int colorCode) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), colorCode);
+}
+
+// Konstanta Warna (Biar gampang aja si ingat angkanya)
+const int WHITE = 7;
+const int RED = 4;
+const int BRIGHT_RED = 12;
+const int GREEN = 2;
+const int BLUE = 1;
+
+// Fungsi biar lambet print textnya
+void slowPrint(string text, int speed = 40) {
     for (char c : text) {
         cout << c;
-        delay(speed); // Jeda tiap karakter
+        delay(speed);
     }
     cout << endl;
 }
 
-// Fungsi untuk mengganti warna teks (Merah untuk horror/darah)
-void setColor(int colorCode) {
-    // 7 = Default White, 4 = Red, 12 = Light Red
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), colorCode);
+void jumpScareSound() {
+    // Beep(Frekuensi, Durasi milidetik)
+    Beep(300, 100); 
+    Beep(200, 100);
+    Beep(100, 500); 
 }
+
 
 // --- CLASS PLAYER ---
 class Player {
 public:
-    string name;
-    int sanity; // Pengganti HP (Health Point)
+    string nama;
+    int kewarasan; 
 
     Player(string n) {
-        name = n;
-        sanity = 100;
+        nama = n;
+        kewarasan = 100;
     }
 
-    bool isInsane() {
-        return sanity <= 0;
-    }
+    bool cekWaras() { return kewarasan <= 0; }
 
-    void takeSanityDamage(int amount) {
-        sanity -= amount;
-        if (sanity < 0) sanity = 0;
+    void kewarasanDamage(int amount) {
+        kewarasan -= amount;
+        if (kewarasan < 0) kewarasan = 0;
     }
 };
 
 // --- CLASS GAME ---
 class Game {
 private:
-    Player* player; // Pointer ke object player
+    Player* player;
     bool isRunning;
 
-    // Fungsi rahasia untuk mengambil nama user PC
     string getSystemUsername() {
-        char* username = getenv("USERNAME"); // Command khusus Windows
-        if (username) {
-            return string(username);
-        }
-        return "Pengguna"; // Fallback jika gagal
+        // Mencoba mengambil nama user Windows (breaking 4th wall!!)
+        char* username = getenv("USERNAME"); 
+        if (username) return string(username);
+        return "Tamu tak dikenal"; 
     }
 
 public:
     Game() {
-        // Setup Random Seed agar acak tiap kali main
-        srand(time(0));
+        srand(time(0)); // Seed random
         isRunning = true;
-        
-        // Disini triknya: Kita ambil nama PC mereka, bukan tanya nama.
         string trueName = getSystemUsername();
         player = new Player(trueName);
     }
 
-    // Fungsi RNG (Dadu)
-    // Mengembalikan angka 1 - 100
-    int rollDice() {
+    // Cari Angka (1-100)
+    int rollAngka() {
         return (rand() % 100) + 1;
     }
 
+    // VFX Horror (Glitch) !!
     void glitchEffect() {
-        setColor(12); // Merah Terang
-        cout << "\nERROR... SYSTEM FAILURE... " << player->name << " IS WATCHING...\n";
-        // Cetak karakter acak
-        for(int i=0; i<20; i++) {
-            cout << (char)(rand() % 255); 
-            delay(10);
+        aturWarna(BRIGHT_RED);
+        cout << "\nSYSTEM FAILURE... " << player->nama << "...";
+        for(int i=0; i<15; i++) {
+            cout << (char)(rand() % 90 + 33); // Karakter acak
+            delay(15);
         }
         cout << endl;
-        setColor(7); // Kembalikan ke putih
+        aturWarna(WHITE);
     }
 
     void start() {
-        // Intro
-        setColor(7);
-        slowPrint("...", 200);
-        slowPrint("Sistem diinisialisasi.", 50);
+        // --- INTRO ---
+        system("cls");
+        
+        aturWarna(WHITE);
+        slowPrint("...", 300);
+        slowPrint("Menghubungkan ke terminal...", 60);
         delay(1000);
+
+        cout << "User terdeteksi: ";
+        delay(800);
         
-        // Breaking the 4th Wall
-        cout << "Mendeteksi User ID: ";
-        delay(1500);
-        
-        setColor(12); // Ubah jadi merah
-        slowPrint(player->name, 100); // Nama asli user PC
-        setColor(7); // Balik ke putih
+        aturWarna(BRIGHT_RED); 
+        slowPrint(player->nama, 150); // MENCETAK NAMA PC ASLI
+        aturWarna(WHITE);
         
         delay(1000);
-        slowPrint("\nHalo. Aku sudah menunggumu.", 60);
-        
-        // Contoh Gameplay Loop Sederhana
-        while (isRunning && !player->isInsane()) {
-            cout << "\n-----------------------------------\n";
-            cout << "Sanity: " << player->sanity << "%" << endl;
-            cout << "Apa yang ingin kamu lakukan?\n";
-            cout << "1. Lihat sekeliling\n";
-            cout << "2. Cek file sistem (Bahaya)\n";
-            cout << "3. Keluar\n";
-            cout << "> ";
+        slowPrint("\nJangan melihat ke belakang.", 80);
+        delay(1000);
+
+        // --- GAME LOOP ---
+        while (isRunning && !player->cekWaras()) {
+            cout << "\n===================================\n";
+            cout << "Kewarasan: " << player->kewarasan << "%\n";
+            cout << "1. Masuk ke lorong gelap\n";
+            cout << "2. Diam di tempat\n";
+            cout << "3. Akhiri sesi (Keluar)\n";
+            cout << "Pilihan > ";
             
-            int choice;
-            cin >> choice;
+            int pilihan;
+            // Validasi input agar tidak error kalau user ketik huruf
+            if (!(cin >> pilihan)) {
+                cin.clear();
+                cin.ignore(1000, '\n'); 
+                continue;
+            }
 
-            if (choice == 1) {
-                slowPrint("Ruangan ini gelap. Hanya ada kursor yang berkedip...", 30);
-            } 
-            else if (choice == 2) {
-                slowPrint("Mencoba mengakses data terlarang...", 50);
-                delay(1000);
+            if (pilihan == 1) {
+                slowPrint("Kamu melangkah masuk...", 40);
+                delay(500);
                 
-                int luck = rollDice();
-                cout << "[RNG: " << luck << "]\n"; // Tampilkan angka dadu (bisa dihide nanti)
-
-                if (luck < 40) { // Gagal / Bad Luck
+                // RNG 
+                int hoki = rollAngka();
+                // cout<<hoki; // Debug untuk menjelaskan seed
+                
+                if (hoki < 100) { // 40% kemungkinan buruk
+                    jumpScareSound();
                     glitchEffect();
-                    player->takeSanityDamage(20);
-                    slowPrint("Kepalamu sakit mendadak!", 30);
+                    player->kewarasanDamage(25);
+                    slowPrint("Sesuatu menyentuh kakimu!", 30);
+                    delay(500);
+                    system("cls");
                 } else {
-                    slowPrint("Tidak ada apa-apa di sini. Aman.", 30);
+                    aturWarna(GREEN);
+                    slowPrint("Lorong ini kosong. Kamu aman untuk saat ini.", 30);
+                    aturWarna(WHITE);
+                    delay(500);
+                    system("cls");
                 }
-            } 
-            else if (choice == 3) {
+            }
+            else if (pilihan == 2) {
+                slowPrint("Kamu menunggu...", 50);
+                player->kewarasanDamage(5); // Diam pun mengurangi mental sedikit
+                delay(500);
+                system("cls");
+            }
+            else if (pilihan == 3) {
+                slowPrint("Mencabut koneksi...", 50);
+                delay(500);
                 isRunning = false;
+            }
+            else {
+                slowPrint("ASTAGA, KAMU BODOH ATAU GIMANA?! ITU KAN ADA OPSI PILIHANNYA!?", 20);
+                delay(500);
+                system("cls");
             }
         }
 
-        if (player->isInsane()) {
-            setColor(4);
-            slowPrint("\nKEWARASANMU HABIS. GAME OVER.", 100);
+        // --- GAME OVER ---
+        if (player->cekWaras()) {
+            aturWarna(RED);
+            cout << "\n\n=== PIKIRANMU HANCUR ===\n";
+            cout << "Game Over.\n";
+            aturWarna(WHITE);
+            delay(2000);
         }
     }
 };
 
-// --- MAIN FUNCTION ---
 int main() {
+    system("title PROJECT: SENDIRI DI RUANG PRODI"); 
+    
     Game myGame;
     myGame.start();
+    
     return 0;
 }
