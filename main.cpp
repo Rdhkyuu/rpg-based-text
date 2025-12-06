@@ -8,12 +8,18 @@ using namespace std;
 
 // Deklarasi paling awal
 class Cerita;
-class Lobby;       
-class LorongKanan;
+class RuangProdi;       
 class LorongKiri;
-class RuangKelas;  // Lokasi Baru (Ending Lorong Kanan)
+class LorongKanan;
+class RuangKelas; 
+class Parkiran;
 
 // --- UTILITIES ---
+
+int rollAngka() {
+    return (rand() % 100) + 1;
+}
+
 
 void delay(int ms) {
     Sleep(ms);
@@ -98,9 +104,14 @@ public:
 };
 
 // definis class dulu tapi blum diisi
-class Lobby : public Cerita {
+class RuangProdi : public Cerita {
 public:
+    bool cekStatusAlur;
     Cerita* mainkan(Player* p) override;
+
+    RuangProdi(bool statusPertama) {
+        cekStatusAlur = statusPertama;
+    }
     
 };
 
@@ -109,26 +120,42 @@ public:
     Cerita* mainkan(Player* p) override;
 };
 
-class LorongKiri : public Cerita {
+class LorongKanan : public Cerita {
 public:
     Cerita* mainkan(Player* p) override;
     
 };
 
-class LorongKanan : public Cerita {
+class LorongKiri : public Cerita {
 public:
     Cerita* mainkan(Player* p) override;
    
 };
 
     // isi dari masing masing class
-    Cerita* Lobby::mainkan(Player* p) {
-        system("cls");
+    Cerita* RuangProdi::mainkan(Player* p) {
+        system("cls"); 
         aturWarna(WHITE);
+        if (cekStatusAlur)
+        {
+            slowPrint("Setelah kamu mengetahui kamu sendirian di ruang prodi, kamu bergegas untuk keluar dari kelas...", 20);
+            slowPrint("Wah, ajaib sekali pintunya masih terbuka di jam seperti ini...", 20);
+            delay(100);
+            slowPrint("\nKamu menengok ke kiri dan ke kanan, memandangi lorong yang gelap...", 10);
+            slowPrint("Entah kenapa... hari ini fakultas teknis keliatannya... kosong?", 10);
+            slowPrint("Terlintas dalam pikiranmu hanya satu, yaitu pergi dari sini atau setidaknya pulang.", 10);
+            slowPrint("Tujuanmu saat ini adalah mencapai sepeda motor yang biasa kamu pakai.", 10);
+            delay(100);
+            slowPrint("\nDi lorong sebelah kanan, itu adalah jalan yang tercepat untuk mencapai parkiran... tapi entah kenapa kamu yakin bahwa gerbang di lorong itu terkunci...", 10);
+            slowPrint("Sedangkan di lorong sebelah kiri, itu adalah lorong yang biasanya masih dibuka hingga larut malam walaupun sedikit agak jauh...", 10);
+        } else {
+            slowPrint("Kamu kembali lagi ke ruang prodi...", 5);
+        }
+        
         cout << "\n[LOKASI: Ruang Prodi]\n";
         cout << "Kewarasan: " << p->kewarasan << "%\n";
-        cout << "1. Belok ke lorong kanan\n";
-        cout << "2. Belok ke lorong kiri\n";
+        cout << "1. Belok ke lorong kiri\n";
+        cout << "2. Belok ke lorong Kanan\n";
         cout << "3. Diam (Exit)\n";
         cout << "Pilihan > ";
 
@@ -136,23 +163,22 @@ public:
         cin >> pil;
 
         if (pil == 1) {
-            // ESTAFET: Kembalikan Object Lorong Kanan ke Game
-            return new LorongKanan(); 
+            return new LorongKiri(); 
         } 
         else if (pil == 2) {
-             return new LorongKiri(); // (Bikin nanti)
+             return new LorongKanan(); 
              
         }
         else {
-            return nullptr; // Sinyal untuk keluar game
+            return nullptr; 
         }
     }
 
-    Cerita* LorongKanan::mainkan(Player* p)  {
-        system("cls"); // Bersihkan layar biar fresh
+    Cerita* LorongKiri::mainkan(Player* p)  {
+        system("cls"); 
         aturWarna(WHITE);
-        cout << "[LOKASI: LORONG KANAN]\n";
-        slowPrint("Kamu berjalan menyusuri lorong kanan yang panjang...", 30);
+        cout << "[LOKASI: LORONG KIRI]\n";
+        slowPrint("Kamu berjalan menyusuri lorong kiri yang panjang...", 30);
         delay(1000);
 
         // --- INI LOGIKA RNG DI BALIK LAYAR ---
@@ -202,7 +228,7 @@ public:
         cout << "\n=====================\n";
         cout << "\nKamu sampai di ujung lorong. Ada pintu '2B'.\n";
         cout << "1. Masuk Ruang Kelas\n";
-        cout << "2. Lari balik ke Lobby\n> ";
+        cout << "2. Lari balik ke RuangProdi\n> ";
         
         int pil;
         cin >> pil;
@@ -210,39 +236,75 @@ public:
         if (pil == 1) {
             return new RuangKelas(); // MAJU KE DEPAN
         } else {
-            return new Lobby(); // MUNDUR KE BELAKANG
+            return new RuangProdi(false); // MUNDUR KE BELAKANG
         }
     }
 
-    Cerita* LorongKiri::mainkan(Player* p) {
+    Cerita* LorongKanan::mainkan(Player* p) {
         system("cls"); 
-        cout << "[LOKASI: LORONG KIRI]\n";
-        slowPrint("Lorong ini penuh dengan air menetes...", 30);
-        delay(1000);
+        cout << "[LOKASI: LORONG KANAN]\n";
+        cout << "Kewarasan: " << p->kewarasan << "%\n";
+        slowPrint("Terbiasa melewati lorong ini, tapi entah kenapa kamu waspada saat berjalan...", 30);
+        slowPrint("Dan benar saja, gerbang tangga untuk menuju kebawah terkunci...", 30);
+        delay(500);
+        slowPrint("Kamu berpikir untuk mencoba memanjatnya atau balik ke ruang prodi.", 30);
         
-        slowPrint("Kamu berjalan hati-hati. Sepertinya aman.", 30);
-        
-        aturWarna(GREEN); 
-        cout << "(Kamu merasa sedikit tenang. Kewarasan +5)\n";
-        p->healKewarasan(5);
-        
-        aturWarna(WHITE);
-        delay(1500);
-
-        cout << "\n=====================\n";
-        cout << "\nAnehnya, tiba-tiba ada tembok yang secara ajaib muncul menghalangi lorong ini?\n";
-        cout << "1. Mengecek sekeliling terlebih dahulu\n";
-        cout << "2. Lari balik ke Lobby\n> ";
+        cout << "=====================\n";
+        cout << "1. Mencoba memanjatnya\n";
+        cout << "2. Lari balik ke Ruang Prodi\n> ";
         
         int pil;
         cin >> pil;
         
         if (pil == 1) {
-            slowPrint("Kamu mengecek sebentar... tetapi tidak ada apa-apa disini", 5);
+            while (true) {
+            slowPrint("Kamu mencoba memanjat...", 5);
             delay(500);
-            return new Lobby();
+            int gamble = rollAngka();
+
+                if (gamble<70)
+                {
+                    aturWarna(BRIGHT_RED);
+                    slowPrint("Kamu terpleset saat mencoba memanjat!", 30);
+                    p->kewarasanDamage(20);
+                    aturWarna(WHITE);
+
+                    if (p->kewarasan <= 0) return nullptr; // MATI AWKAKWKAKW
+
+                    cout << "\n=====================\n";
+                    cout << "1. Mencoba memanjatnya lagi...?\n";
+                    cout << "2. Lari balik ke Ruang Prodi\n> ";
+        
+                    int pil2;
+                    cin >> pil2;
+                    if (pil2 == 1)
+                    {
+                        system("cls");
+                        cout << "[Mencoba lagi...]\n";
+                        continue;
+                    } else {
+                        return new RuangProdi(false);
+                    }
+                } else {
+                    aturWarna(GREEN);
+                    slowPrint("BERHASIL! Kamu berhasil melewati gerbang!", 30);
+                    aturWarna(WHITE);
+                    delay(1000);
+            
+                    // CONTOH: Lanjut ke area baru (misal Lantai 1)
+                    // return new LantaiSatu(); 
+                    
+                    // Atau kalau belum ada class-nya, tamatin aja dulu:
+                    slowPrint("Kamu lari keluar gedung... Kamu selamat! (ENTER UNTUK TAMAT)", 50);
+                    cout<<"";
+                    cin.get();
+                    return nullptr;
+                }
+                
+            }
+            
         } else {
-            return new Lobby(); // MUNDUR KE BELAKANG
+            return new RuangProdi(false); 
         }
     }
 
@@ -250,17 +312,17 @@ public:
         system("cls");
         cout << "[LOKASI: RUANG KELAS 2B]\n";
         cout << "Kewarasan: " << p->kewarasan << "%\n";
-        
+
         slowPrint("Pintu terbuka berderit...", 30);
         slowPrint("Di sini aman. Kamu menemukan peta.", 30);
         
         cout << "\nSekarang mau ke mana?\n";
-        cout << "1. Balik ke Lobby Utama\n";
+        cout << "1. Balik ke Ruang Prodi Utama\n";
         cout << "2. Tidur di sini (End Game)\n> ";
         int pil;
         cin >> pil;
         
-        if (pil == 1) return new Lobby(); // MUTER BALIK KE DEPAN
+        if (pil == 1) return new RuangProdi(false); // MUTER BALIK KE DEPAN
         else return nullptr; // TAMAT
     }
 
@@ -287,15 +349,10 @@ public:
         player = new Player(trueName);
     }
 
-    // Cari Angka (1-100)
-    int rollAngka() {
-        return (rand() % 100) + 1;
-    }
-
     
 
     void start() {
-        Cerita* lokasiSekarang = new Lobby();
+        Cerita* lokasiSekarang = new RuangProdi(true);
         // --- INTRO ---
         system("cls");
         
@@ -306,20 +363,23 @@ public:
         delay(1000);
         slowPrint("Dan entah kenapa pada saat itu, aku tertidur...", 5);
         delay(1000);
-
         cout << "\n[Tekan Enter untuk lanjut...]";
         cin.get();
 
         system("cls");
         slowPrint("Terbangun, ruangan telah sepi... dengan kondisi di luar yang sudah gelap gulita.", 50);
+        slowPrint("Kamu melihat sekelilingmu, tidak ada siapapun kecuali dirimu.", 50);
+        slowPrint("Berpikir dalam hati, apakah aku ditinggalkan begitu saja?", 50);
         delay(2000);
+        cout << "\n[Tekan Enter untuk lanjut...]";
+        cin.get();
 
-        cout << "User terdeteksi: ";
-        delay(800);
-        
-        aturWarna(BRIGHT_RED); 
-        slowPrint(player->nama, 150); // MENCETAK NAMA PC ASLI
-        aturWarna(WHITE);
+        // Nanti buat breaking 4th wall, nge print nama system bukan nama inputan
+        // cout << "User terdeteksi: ";
+        // delay(800);
+        // aturWarna(BRIGHT_RED); 
+        // slowPrint(player->nama, 150); // MENCETAK NAMA PC ASLI
+        // aturWarna(WHITE);
         
      
         // --- GAME LOOP ---
