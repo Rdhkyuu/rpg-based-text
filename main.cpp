@@ -40,6 +40,20 @@ void jumpScareSound() {
     Beep(100, 500); 
 }
 
+    // VFX Horror (Glitch) !!
+void glitchEffect(string namaTarget) {
+    aturWarna(BRIGHT_RED);
+    cout << "\nSYSTEM FAILURE... " << namaTarget << "...";
+
+    for(int i=0; i<15; i++) {
+        cout << (char)(rand() % 90 + 33); // Karakter acak
+        delay(15);
+    }
+    cout << endl;
+    aturWarna(WHITE);
+ }
+
+
 // --- CLASS PLAYER ---
 class Player {
 public:
@@ -57,6 +71,11 @@ public:
         kewarasan -= amount;
         if (kewarasan < 0) kewarasan = 0;
     }
+
+    void healKewarasan(int amount) {
+        kewarasan += amount;
+        if (kewarasan > 100) kewarasan = 100;
+    }
 };
 
 class Cerita {
@@ -64,11 +83,31 @@ public:
     // Virtual Function: Ini adalah "Lubang Kunci" yang akan diisi berbeda-beda oleh anaknya.
     // Kita butuh akses ke Player biar cerita bisa mengurangi kewarasan.
     virtual void mainkan(Player* p) {
-        cout << "Ini cerita kosong...\n";
+        cout << "Template kosong, hehe!\n";
     }
     
     // Virtual Destructor (Penting saat main inheritance)
     virtual ~Cerita() {} 
+};
+
+class LorongKiri : public Cerita {
+public:
+    void mainkan(Player* p) override {
+        system("cls"); 
+        aturWarna(GREEN); 
+        cout << "[LOKASI: LORONG KIRI]\n";
+        slowPrint("Lorong ini penuh dengan air menetes...", 30);
+        delay(1000);
+        
+        slowPrint("Kamu berjalan hati-hati. Sepertinya aman.", 30);
+        
+        cout << "(Kamu merasa sedikit tenang. Kewarasan +5)\n";
+        p->healKewarasan(5);
+        
+        aturWarna(WHITE);
+        delay(1500);
+        system("cls"); // Bersihkan layar sebelum balik ke menu
+    }
 };
 
 class LorongKanan : public Cerita {
@@ -97,21 +136,22 @@ public:
                 cin >> pil1;
                 if (pil1 == 1) {
                     jumpScareSound();
+                    glitchEffect(p->nama);
                     slowPrint("TIDAK ADA SIAPA-SIAPA!", 20);
-                    p->kewarasanDamage(10); // Kena mental dikit
+                    p->kewarasanDamage(10);
                 } else {
                     slowPrint("Kamu mempercepat langkahmu.", 30);
                 }
                 break;
 
-            case 1: // EVENT 2: Melihat Sesuatu (Visual Horror)
+            case 1: 
                 aturWarna(RED);
                 slowPrint("Di ujung lorong... ada bayangan berdiri tegak.", 40);
                 aturWarna(WHITE);
                 delay(1000);
                 slowPrint("Tunggu... itu cuma gantungan baju janitor.", 30);
                 cout << "(Helaan napas lega... Kewarasan pulih sedikit)\n";
-                // Bisa nambah logic heal sedikit kalau mau
+                p->healKewarasan(5);
                 break;
 
             case 2: // EVENT 3: Kosong (Aman)
@@ -128,42 +168,6 @@ public:
     }
 };
 
-// --- ANAK 1: CERITA UTAMA (Normal) ---
-class CeritaUtama : public Cerita {
-public:
-    void mainkan(Player* p) override {
-        cout << "\n[LOKASI: PERPUSTAKAAN KAMPUS]\n";
-        cout << "Lampu berkedip. Kamu melihat buku tua terbuka sendiri.\n";
-        cout << "1. Baca buku itu\n2. Lari keluar\n> ";
-        
-        int pilihan;
-        cin >> pilihan;
-
-        if (pilihan == 1) {
-            cout << "Tulisan di buku itu berubah menjadi darah...\n";
-            p->kewarasanDamage(10);
-        } else {
-            cout << "Kamu lari seperti pengecut.\n";
-        }
-    }
-};
-
-// --- ANAK 2: CERITA RAHASIA (Horror/Glitch) ---
-class CeritaRahasia : public Cerita {
-public:
-    void mainkan(Player* p) override {
-        aturWarna(BRIGHT_RED); // Merah
-        cout << "\n[LOKASI: ???_ERROR_???]\n";
-        cout << "KENAPA KAMU DATANG KE SINI, " << p->nama << "?\n";
-        
-        // Logika Horror
-        p->kewarasanDamage(50); // Damage besar!
-        cout << "Pikiranmu terasa terbakar!\n";
-        
-        aturWarna(WHITE); // Balikin warna
-        delay(2000);
-    }
-};
 
 // --- CLASS GAME ---
 class Game {
@@ -185,7 +189,6 @@ public:
         isRunning = true;
         string trueName = getSystemUsername();
         player = new Player(trueName);
-        lokasiAktif = new CeritaUtama();
     }
 
     // Cari Angka (1-100)
@@ -193,17 +196,6 @@ public:
         return (rand() % 100) + 1;
     }
 
-    // VFX Horror (Glitch) !!
-    void glitchEffect() {
-        aturWarna(BRIGHT_RED);
-        cout << "\nSYSTEM FAILURE... " << player->nama << "...";
-        for(int i=0; i<15; i++) {
-            cout << (char)(rand() % 90 + 33); // Karakter acak
-            delay(15);
-        }
-        cout << endl;
-        aturWarna(WHITE);
-    }
 
     void gantiLokasi(int tipe) {
         // Hapus lokasi lama dari memori dulu (PENTING biar RAM gak bocor)
@@ -211,7 +203,7 @@ public:
 
         // Ganti dengan lokasi baru sesuai tipe
         if (tipe == 1) {
-            lokasiAktif = new CeritaUtama();
+            
         } 
         else if (tipe == 2) {
             lokasiAktif = new LorongKanan(); 
@@ -245,19 +237,16 @@ public:
         slowPrint(player->nama, 150); // MENCETAK NAMA PC ASLI
         aturWarna(WHITE);
         
-        delay(1000);
-        slowPrint("\nJangan melihat ke belakang.", 80);
-        delay(1000);
-
+     
         // --- GAME LOOP ---
         while (isRunning && !player->cekWaras()) {
         
-        
             cout << "\n===================================\n";
             cout << "Kewarasan: " << player->kewarasan << "%\n";
-            cout << "1. Masuk ke lorong gelap\n";
-            cout << "2. Diam di tempat\n";
-            cout << "3. Akhiri sesi (Keluar)\n";
+            cout << "1. Belok ke lorong kiri\n";
+            cout << "2. Belok ke lorong kanan\n";
+            cout << "3. Diam di tempat\n";
+            cout << "4. Akhiri sesi (Keluar)\n";
             cout << "Pilihan > ";
             
             int pilihan;
@@ -268,44 +257,35 @@ public:
                 continue;
             }
 
+            Cerita* lokasiSekarang = nullptr; // Siapkan pointer kosong (Tiket Kosong)
+
             if (pilihan == 1) {
-                slowPrint("Kamu melangkah masuk...", 40);
-                delay(500);
-                
-                // RNG 
-                int hoki = rollAngka();
-                // cout<<hoki; // Debug untuk menjelaskan seed
-                
-                if (hoki < 100) { // 40% kemungkinan buruk
-                    jumpScareSound();
-                    glitchEffect();
-                    player->kewarasanDamage(25);
-                    slowPrint("Sesuatu menyentuh kakimu!", 30);
-                    delay(500);
-                    system("cls");
-                } else {
-                    aturWarna(GREEN);
-                    slowPrint("Lorong ini kosong. Kamu aman untuk saat ini.", 30);
-                    aturWarna(WHITE);
-                    delay(500);
-                    system("cls");
-                }
+                // User pilih Kiri -> Buat Object Lorong Kiri
+                lokasiSekarang = new LorongKiri();
             }
             else if (pilihan == 2) {
-                slowPrint("Kamu menunggu...", 50);
-                player->kewarasanDamage(5); // Diam pun mengurangi mental sedikit
-                delay(500);
-                system("cls");
+                // User pilih Kanan -> Buat Object Lorong Kanan
+                lokasiSekarang = new LorongKanan();
             }
             else if (pilihan == 3) {
-                slowPrint("Mencabut koneksi...", 50);
-                delay(500);
+                slowPrint("Kamu diam mematung...", 30);
+                player->kewarasanDamage(5);
+                system("cls");
+            }
+            else if (pilihan == 4) {
                 isRunning = false;
             }
-            else {
-                slowPrint("ASTAGA, KAMU BODOH ATAU GIMANA?! ITU KAN ADA OPSI PILIHANNYA!?", 20);
-                delay(500);
-                system("cls");
+
+            // --- EKSEKUSI CERITA ---
+            // Jika lokasiSekarang ada isinya (bukan nullptr), jalankan!
+            if (lokasiSekarang != nullptr) {
+                
+                // 1. Jalankan Ceritanya
+                lokasiSekarang->mainkan(player);
+
+                // 2. PENTING: Hapus dari memori setelah selesai (Robek Tiket)
+                delete lokasiSekarang; 
+                lokasiSekarang = nullptr; // Reset jadi kosong lagi
             }
         }
 
