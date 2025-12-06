@@ -6,6 +6,13 @@
 
 using namespace std;
 
+// Deklarasi paling awal
+class Cerita;
+class Lobby;       
+class LorongKanan;
+class LorongKiri;
+class RuangKelas;  // Lokasi Baru (Ending Lorong Kanan)
+
 // --- UTILITIES ---
 
 void delay(int ms) {
@@ -82,40 +89,69 @@ class Cerita {
 public:
     // Virtual Function: Ini adalah "Lubang Kunci" yang akan diisi berbeda-beda oleh anaknya.
     // Kita butuh akses ke Player biar cerita bisa mengurangi kewarasan.
-    virtual void mainkan(Player* p) {
-        cout << "Template kosong, hehe!\n";
+    virtual Cerita* mainkan(Player* p) {
+        return nullptr; // Default
     }
     
     // Virtual Destructor (Penting saat main inheritance)
     virtual ~Cerita() {} 
 };
 
+// definis class dulu tapi blum diisi
+class Lobby : public Cerita {
+public:
+    Cerita* mainkan(Player* p) override;
+    
+};
+
+class RuangKelas : public Cerita {
+public:
+    Cerita* mainkan(Player* p) override;
+};
+
 class LorongKiri : public Cerita {
 public:
-    void mainkan(Player* p) override {
-        system("cls"); 
-        aturWarna(GREEN); 
-        cout << "[LOKASI: LORONG KIRI]\n";
-        slowPrint("Lorong ini penuh dengan air menetes...", 30);
-        delay(1000);
-        
-        slowPrint("Kamu berjalan hati-hati. Sepertinya aman.", 30);
-        
-        cout << "(Kamu merasa sedikit tenang. Kewarasan +5)\n";
-        p->healKewarasan(5);
-        
-        aturWarna(WHITE);
-        delay(1500);
-        system("cls"); // Bersihkan layar sebelum balik ke menu
-    }
+    Cerita* mainkan(Player* p) override;
+    
 };
 
 class LorongKanan : public Cerita {
 public:
-    void mainkan(Player* p) override {
+    Cerita* mainkan(Player* p) override;
+   
+};
+
+    // isi dari masing masing class
+    Cerita* Lobby::mainkan(Player* p) {
+        system("cls");
+        aturWarna(WHITE);
+        cout << "\n[LOKASI: Ruang Prodi]\n";
+        cout << "Kewarasan: " << p->kewarasan << "%\n";
+        cout << "1. Belok ke lorong kanan\n";
+        cout << "2. Belok ke lorong kiri\n";
+        cout << "3. Diam (Exit)\n";
+        cout << "Pilihan > ";
+
+        int pil;
+        cin >> pil;
+
+        if (pil == 1) {
+            // ESTAFET: Kembalikan Object Lorong Kanan ke Game
+            return new LorongKanan(); 
+        } 
+        else if (pil == 2) {
+             return new LorongKiri(); // (Bikin nanti)
+             
+        }
+        else {
+            return nullptr; // Sinyal untuk keluar game
+        }
+    }
+
+    Cerita* LorongKanan::mainkan(Player* p)  {
         system("cls"); // Bersihkan layar biar fresh
         aturWarna(WHITE);
-        cout << "[LOKASI: LORONG SAYAP KANAN]\n";
+        cout << "[LOKASI: LORONG KANAN]\n";
         slowPrint("Kamu berjalan menyusuri lorong kanan yang panjang...", 30);
         delay(1000);
 
@@ -163,10 +199,70 @@ public:
         // --- BAGIAN KELUAR DARI LORONG ---
         // Setelah event selesai, lanjut ke narasi utama
         delay(1000);
-        cout << "\nDi ujung lorong, kamu menemukan sebuah pintu kelas 2B.\n";
-        // Disini nanti logika untuk pindah ke Class Cerita selanjutnya...
+        cout << "\n=====================\n";
+        cout << "\nKamu sampai di ujung lorong. Ada pintu '2B'.\n";
+        cout << "1. Masuk Ruang Kelas\n";
+        cout << "2. Lari balik ke Lobby\n> ";
+        
+        int pil;
+        cin >> pil;
+        
+        if (pil == 1) {
+            return new RuangKelas(); // MAJU KE DEPAN
+        } else {
+            return new Lobby(); // MUNDUR KE BELAKANG
+        }
     }
-};
+
+    Cerita* LorongKiri::mainkan(Player* p) {
+        system("cls"); 
+        cout << "[LOKASI: LORONG KIRI]\n";
+        slowPrint("Lorong ini penuh dengan air menetes...", 30);
+        delay(1000);
+        
+        slowPrint("Kamu berjalan hati-hati. Sepertinya aman.", 30);
+        
+        aturWarna(GREEN); 
+        cout << "(Kamu merasa sedikit tenang. Kewarasan +5)\n";
+        p->healKewarasan(5);
+        
+        aturWarna(WHITE);
+        delay(1500);
+
+        cout << "\n=====================\n";
+        cout << "\nAnehnya, tiba-tiba ada tembok yang secara ajaib muncul menghalangi lorong ini?\n";
+        cout << "1. Mengecek sekeliling terlebih dahulu\n";
+        cout << "2. Lari balik ke Lobby\n> ";
+        
+        int pil;
+        cin >> pil;
+        
+        if (pil == 1) {
+            slowPrint("Kamu mengecek sebentar... tetapi tidak ada apa-apa disini", 5);
+            delay(500);
+            return new Lobby();
+        } else {
+            return new Lobby(); // MUNDUR KE BELAKANG
+        }
+    }
+
+    Cerita* RuangKelas::mainkan(Player* p)  {
+        system("cls");
+        cout << "[LOKASI: RUANG KELAS 2B]\n";
+        cout << "Kewarasan: " << p->kewarasan << "%\n";
+        
+        slowPrint("Pintu terbuka berderit...", 30);
+        slowPrint("Di sini aman. Kamu menemukan peta.", 30);
+        
+        cout << "\nSekarang mau ke mana?\n";
+        cout << "1. Balik ke Lobby Utama\n";
+        cout << "2. Tidur di sini (End Game)\n> ";
+        int pil;
+        cin >> pil;
+        
+        if (pil == 1) return new Lobby(); // MUTER BALIK KE DEPAN
+        else return nullptr; // TAMAT
+    }
 
 
 // --- CLASS GAME ---
@@ -196,22 +292,10 @@ public:
         return (rand() % 100) + 1;
     }
 
-
-    void gantiLokasi(int tipe) {
-        // Hapus lokasi lama dari memori dulu (PENTING biar RAM gak bocor)
-        delete lokasiAktif; 
-
-        // Ganti dengan lokasi baru sesuai tipe
-        if (tipe == 1) {
-            
-        } 
-        else if (tipe == 2) {
-            lokasiAktif = new LorongKanan(); 
-        }
-    }
     
 
     void start() {
+        Cerita* lokasiSekarang = new Lobby();
         // --- INTRO ---
         system("cls");
         
@@ -240,53 +324,21 @@ public:
      
         // --- GAME LOOP ---
         while (isRunning && !player->cekWaras()) {
+
+            if (lokasiSekarang == nullptr) {
+            isRunning = false; // Kalau gak ada lokasi, berarti game over/exit
+            break;
+            }
+            // 1. JALANKAN LOKASI SAAT INI
+            // Dan TANGKAP lokasi berikutnya yang dilempar oleh return
+            Cerita* lokasiSelanjutnya = lokasiSekarang->mainkan(player);
+            // 2. HAPUS LOKASI LAMA (Memory Management)
+            delete lokasiSekarang;
+
+            // 3. PINDAH KE LOKASI BARU
+            lokasiSekarang = lokasiSelanjutnya;
         
-            cout << "\n===================================\n";
-            cout << "Kewarasan: " << player->kewarasan << "%\n";
-            cout << "1. Belok ke lorong kiri\n";
-            cout << "2. Belok ke lorong kanan\n";
-            cout << "3. Diam di tempat\n";
-            cout << "4. Akhiri sesi (Keluar)\n";
-            cout << "Pilihan > ";
             
-            int pilihan;
-            // Validasi input agar tidak error kalau user ketik huruf
-            if (!(cin >> pilihan)) {
-                cin.clear();
-                cin.ignore(1000, '\n'); 
-                continue;
-            }
-
-            Cerita* lokasiSekarang = nullptr; // Siapkan pointer kosong (Tiket Kosong)
-
-            if (pilihan == 1) {
-                // User pilih Kiri -> Buat Object Lorong Kiri
-                lokasiSekarang = new LorongKiri();
-            }
-            else if (pilihan == 2) {
-                // User pilih Kanan -> Buat Object Lorong Kanan
-                lokasiSekarang = new LorongKanan();
-            }
-            else if (pilihan == 3) {
-                slowPrint("Kamu diam mematung...", 30);
-                player->kewarasanDamage(5);
-                system("cls");
-            }
-            else if (pilihan == 4) {
-                isRunning = false;
-            }
-
-            // --- EKSEKUSI CERITA ---
-            // Jika lokasiSekarang ada isinya (bukan nullptr), jalankan!
-            if (lokasiSekarang != nullptr) {
-                
-                // 1. Jalankan Ceritanya
-                lokasiSekarang->mainkan(player);
-
-                // 2. PENTING: Hapus dari memori setelah selesai (Robek Tiket)
-                delete lokasiSekarang; 
-                lokasiSekarang = nullptr; // Reset jadi kosong lagi
-            }
         }
 
         // --- GAME OVER ---
