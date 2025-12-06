@@ -40,7 +40,6 @@ void jumpScareSound() {
     Beep(100, 500); 
 }
 
-
 // --- CLASS PLAYER ---
 class Player {
 public:
@@ -60,11 +59,61 @@ public:
     }
 };
 
+class Cerita {
+public:
+    // Virtual Function: Ini adalah "Lubang Kunci" yang akan diisi berbeda-beda oleh anaknya.
+    // Kita butuh akses ke Player biar cerita bisa mengurangi kewarasan.
+    virtual void mainkan(Player* p) {
+        cout << "Ini cerita kosong...\n";
+    }
+    
+    // Virtual Destructor (Penting saat main inheritance)
+    virtual ~Cerita() {} 
+};
+
+// --- ANAK 1: CERITA UTAMA (Normal) ---
+class CeritaUtama : public Cerita {
+public:
+    void mainkan(Player* p) override {
+        cout << "\n[LOKASI: PERPUSTAKAAN KAMPUS]\n";
+        cout << "Lampu berkedip. Kamu melihat buku tua terbuka sendiri.\n";
+        cout << "1. Baca buku itu\n2. Lari keluar\n> ";
+        
+        int pilihan;
+        cin >> pilihan;
+
+        if (pilihan == 1) {
+            cout << "Tulisan di buku itu berubah menjadi darah...\n";
+            p->kewarasanDamage(10);
+        } else {
+            cout << "Kamu lari seperti pengecut.\n";
+        }
+    }
+};
+
+// --- ANAK 2: CERITA RAHASIA (Horror/Glitch) ---
+class CeritaRahasia : public Cerita {
+public:
+    void mainkan(Player* p) override {
+        aturWarna(BRIGHT_RED); // Merah
+        cout << "\n[LOKASI: ???_ERROR_???]\n";
+        cout << "KENAPA KAMU DATANG KE SINI, " << p->nama << "?\n";
+        
+        // Logika Horror
+        p->kewarasanDamage(50); // Damage besar!
+        cout << "Pikiranmu terasa terbakar!\n";
+        
+        aturWarna(WHITE); // Balikin warna
+        delay(2000);
+    }
+};
+
 // --- CLASS GAME ---
 class Game {
 private:
     Player* player;
     bool isRunning;
+    Cerita* lokasiAktif;
 
     string getSystemUsername() {
         // Mencoba mengambil nama user Windows (breaking 4th wall!!)
@@ -79,6 +128,7 @@ public:
         isRunning = true;
         string trueName = getSystemUsername();
         player = new Player(trueName);
+        lokasiAktif = new CeritaUtama();
     }
 
     // Cari Angka (1-100)
@@ -97,6 +147,20 @@ public:
         cout << endl;
         aturWarna(WHITE);
     }
+
+    void gantiLokasi(int tipe) {
+        // Hapus lokasi lama dari memori dulu (PENTING biar RAM gak bocor)
+        delete lokasiAktif; 
+
+        // Ganti dengan lokasi baru sesuai tipe
+        if (tipe == 1) {
+            lokasiAktif = new CeritaUtama();
+        } 
+        else if (tipe == 2) {
+            lokasiAktif = new CeritaRahasia(); // Ganti wujud jadi horror
+        }
+    }
+    
 
     void start() {
         // --- INTRO ---
@@ -120,60 +184,70 @@ public:
 
         // --- GAME LOOP ---
         while (isRunning && !player->cekWaras()) {
-            cout << "\n===================================\n";
-            cout << "Kewarasan: " << player->kewarasan << "%\n";
-            cout << "1. Masuk ke lorong gelap\n";
-            cout << "2. Diam di tempat\n";
-            cout << "3. Akhiri sesi (Keluar)\n";
-            cout << "Pilihan > ";
-            
-            int pilihan;
-            // Validasi input agar tidak error kalau user ketik huruf
-            if (!(cin >> pilihan)) {
-                cin.clear();
-                cin.ignore(1000, '\n'); 
-                continue;
-            }
+            lokasiAktif->mainkan(player);
+            // Contoh logika pindah sederhana buat testing
+            cout << "\n(Debug: Mau pindah kemana? 1.Utama 2.Rahasia 3.Keluar) > ";
+            int pindah;
+            cin >> pindah;
 
-            if (pilihan == 1) {
-                slowPrint("Kamu melangkah masuk...", 40);
-                delay(500);
+            if (pindah == 3) isRunning = false;
+            else gantiLokasi(pindah);
+            
+            system("cls");
+            // cout << "\n===================================\n";
+            // cout << "Kewarasan: " << player->kewarasan << "%\n";
+            // cout << "1. Masuk ke lorong gelap\n";
+            // cout << "2. Diam di tempat\n";
+            // cout << "3. Akhiri sesi (Keluar)\n";
+            // cout << "Pilihan > ";
+            
+            // int pilihan;
+            // // Validasi input agar tidak error kalau user ketik huruf
+            // if (!(cin >> pilihan)) {
+            //     cin.clear();
+            //     cin.ignore(1000, '\n'); 
+            //     continue;
+            // }
+
+            // if (pilihan == 1) {
+            //     slowPrint("Kamu melangkah masuk...", 40);
+            //     delay(500);
                 
-                // RNG 
-                int hoki = rollAngka();
-                // cout<<hoki; // Debug untuk menjelaskan seed
+            //     // RNG 
+            //     int hoki = rollAngka();
+            //     // cout<<hoki; // Debug untuk menjelaskan seed
                 
-                if (hoki < 100) { // 40% kemungkinan buruk
-                    jumpScareSound();
-                    glitchEffect();
-                    player->kewarasanDamage(25);
-                    slowPrint("Sesuatu menyentuh kakimu!", 30);
-                    delay(500);
-                    system("cls");
-                } else {
-                    aturWarna(GREEN);
-                    slowPrint("Lorong ini kosong. Kamu aman untuk saat ini.", 30);
-                    aturWarna(WHITE);
-                    delay(500);
-                    system("cls");
-                }
-            }
-            else if (pilihan == 2) {
-                slowPrint("Kamu menunggu...", 50);
-                player->kewarasanDamage(5); // Diam pun mengurangi mental sedikit
-                delay(500);
-                system("cls");
-            }
-            else if (pilihan == 3) {
-                slowPrint("Mencabut koneksi...", 50);
-                delay(500);
-                isRunning = false;
-            }
-            else {
-                slowPrint("ASTAGA, KAMU BODOH ATAU GIMANA?! ITU KAN ADA OPSI PILIHANNYA!?", 20);
-                delay(500);
-                system("cls");
-            }
+            //     if (hoki < 100) { // 40% kemungkinan buruk
+            //         jumpScareSound();
+            //         glitchEffect();
+            //         player->kewarasanDamage(25);
+            //         slowPrint("Sesuatu menyentuh kakimu!", 30);
+            //         delay(500);
+            //         system("cls");
+            //     } else {
+            //         aturWarna(GREEN);
+            //         slowPrint("Lorong ini kosong. Kamu aman untuk saat ini.", 30);
+            //         aturWarna(WHITE);
+            //         delay(500);
+            //         system("cls");
+            //     }
+            // }
+            // else if (pilihan == 2) {
+            //     slowPrint("Kamu menunggu...", 50);
+            //     player->kewarasanDamage(5); // Diam pun mengurangi mental sedikit
+            //     delay(500);
+            //     system("cls");
+            // }
+            // else if (pilihan == 3) {
+            //     slowPrint("Mencabut koneksi...", 50);
+            //     delay(500);
+            //     isRunning = false;
+            // }
+            // else {
+            //     slowPrint("ASTAGA, KAMU BODOH ATAU GIMANA?! ITU KAN ADA OPSI PILIHANNYA!?", 20);
+            //     delay(500);
+            //     system("cls");
+            // }
         }
 
         // --- GAME OVER ---
