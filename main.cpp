@@ -16,11 +16,6 @@ class Parkiran;
 
 // --- UTILITIES ---
 
-int rollAngka() {
-    return (rand() % 100) + 1;
-}
-
-
 void delay(int ms) {
     Sleep(ms);
 }
@@ -35,14 +30,28 @@ const int WHITE = 7;
 const int RED = 4;
 const int BRIGHT_RED = 12;
 const int GREEN = 2;
+const int BRIGHT_AQUA = 11;
 const int BLUE = 1;
+
+
+
+int rollAngka() {
+    return (rand() % 100) + 1;
+}
+
+void salahOpsi() {
+    aturWarna(BRIGHT_AQUA);
+    cout << "\nKamu salah opsi... liat lagi pilihannya...";
+    aturWarna(WHITE);
+}
+
 
 // Fungsi biar lambet print textnya
 void slowPrint(string text, int speed = 40) {
 
     for (char c : text) {
         cout << c;
-        delay(speed); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
+        delay(0); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
     }
     cout << endl;
 }
@@ -154,26 +163,35 @@ public:
             slowPrint("Kamu kembali lagi ke ruang prodi...", 5);
         }
         
-        cout << "\n[LOKASI: Ruang Prodi]\n";
-        cout << "Kewarasan: " << p->kewarasan << "%\n";
-        cout << "1. Belok ke lorong kiri\n";
-        cout << "2. Belok ke lorong Kanan\n";
-        cout << "3. Diam (Exit)\n";
-        cout << "Pilihan > ";
+        while (true) {
+            cout << "\n[LOKASI: Ruang Prodi]\n";
+            cout << "Kewarasan: " << p->kewarasan << "%\n";
+            cout << "1. Belok ke lorong kiri\n";
+            cout << "2. Belok ke lorong Kanan\n";
+            cout << "3. Diam (Exit)\n";
+            cout << "Pilihan > ";
 
-        int pil;
-        cin >> pil;
+            int pil;
+            if (!(cin >> pil)) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
+            }
 
-        if (pil == 1) {
-            return new LorongKiri(); 
-        } 
-        else if (pil == 2) {
-             return new LorongKanan(); 
-             
+            if (pil == 1) {
+                return new LorongKiri(); 
+            } 
+            else if (pil == 2) {
+                 return new LorongKanan(); 
+                 
+            }
+            else if (pil == 3) {
+                return nullptr; 
+            } else {
+                salahOpsi();
+            }
         }
-        else {
-            return nullptr; 
-        }
+
     }
 
     Cerita* LorongKiri::mainkan(Player* p)  {
@@ -193,7 +211,13 @@ public:
                 cout << "Kamu mendengar suara seretan kaki di belakangmu.\n";
                 cout << "1. Menoleh\n2. Jalan terus (Cuek)\n> ";
                 int pil1;
-                cin >> pil1;
+                if (!(cin >> pil1)) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+    
+                return new LorongKiri(); 
+                }
+
                 if (pil1 == 1) {
                     jumpScareSound();
                     glitchEffect(p->nama);
@@ -213,7 +237,11 @@ public:
                 cout<<"=========================\n";
                 cout<< "1. Fokuskan matamu untuk melihat sosok itu lebih jelas lagi\n2. Jalan terus dengan pura-pura cuek\n> ";
                 int pil2;
-                cin >> pil2;
+                
+                if (!(cin >> pil2)) {
+                    cin.clear(); cin.ignore(1000, '\n');
+                    return new LorongKiri();
+                }
                 if (pil2 == 1) {
                     delay(500);
                     // jumpscarePhoto(); //Buat sebuah fungsi ini nanti ygy
@@ -237,18 +265,28 @@ public:
         slowPrint("Kamu berhenti di ujung lorong...");
         slowPrint("Di sebelah kirimu adalah musholla untuk perempuan dengan gerbang terkunci,");
         slowPrint("dan di sebelah kananmu adalah lorong panjang yang menunggumu...");
-        cout << "\n=====================\n";
-        cout << "1. Lanjut ke kanan\n";
-        cout << "2. Lari balik ke Ruang Prodi\n> ";
+
+        while(true) {
+            cout << "\n=====================\n";
+            cout << "1. Lanjut ke kanan\n";
+            cout << "2. Lari balik ke Ruang Prodi\n> ";
         
-        int pil;
-        cin >> pil;
-        
-        if (pil == 1) {
-            return new LorongPanjang();
-        } else {
-            return new RuangProdi(false);
+            int pil3;
+            if (!(cin >> pil3)) {
+                cin.clear();
+                cin.ignore(1000, '\n');
+                continue;
+            }
+            if (pil3 == 1) {
+                return new LorongPanjang();
+            } else if (pil3 == 2) {
+                return new RuangProdi(false);
+            } else {
+            salahOpsi();
+           }
         }
+        
+        
     }
 
     Cerita* LorongKanan::mainkan(Player* p) {
@@ -260,66 +298,83 @@ public:
         delay(500);
         slowPrint("Kamu berpikir untuk mencoba memanjatnya atau balik ke ruang prodi.", 30);
         
-        cout << "=====================\n";
-        cout << "1. Mencoba memanjatnya\n";
-        cout << "2. Lari balik ke Ruang Prodi\n> ";
-        
-        int pil;
-        cin >> pil;
-        
-        if (pil == 1) {
-            while (true) {
-            slowPrint("Kamu mencoba memanjat...", 5);
-            delay(500);
-            int gamble = rollAngka();
-            cout << "[DEBUG] Angka Dadu Keluar: " << gamble << endl;
+        while(true) {
+            cout << "=====================\n";
+            cout << "1. Mencoba memanjatnya\n";
+            cout << "2. Lari balik ke Ruang Prodi\n> ";
 
-                if (gamble<70)
-                {
-                    aturWarna(BRIGHT_RED);
-                    slowPrint("Kamu terpleset saat mencoba memanjat!", 30);
-                    p->kewarasanDamage(50);
-                    aturWarna(WHITE);
+            int pil;
 
-                    if (p->kewarasan <= 0) return nullptr; // MATI AWKAKWKAKW
-
-                    cout << "\n=====================\n";
-                    cout << "Kewarasan: " << p->kewarasan << "%\n";
-                    cout << "1. Mencoba memanjatnya lagi...?\n";
-                    cout << "2. Lari balik ke Ruang Prodi\n> ";
-        
-                    int pil2;
-                    cin >> pil2;
-                    if (pil2 == 1)
-                    {
-                        system("cls");
-                        cout << "[Mencoba lagi...]\n";
-                        continue;
-                    } else {
-                        return new RuangProdi(false);
-                    }
-                } else {
-                    aturWarna(GREEN);
-                    slowPrint("BERHASIL! Kamu berhasil melewati gerbang!", 30);
-                    aturWarna(WHITE);
-                    delay(1000);
-            
-                    // CONTOH: Lanjut ke area baru (misal Lantai 1)
-                    // return new LantaiSatu(); 
-                    
-                    // Atau kalau belum ada class-nya, tamatin aja dulu:
-                    slowPrint("Kamu lari keluar gedung... Kamu selamat!", 50);
-                    cout<<"[Enter untuk Keluar!]";
-                    cin.ignore(1000, '\n');
-                    cin.get();
-                    return nullptr;
-                }
-                
+            if (!(cin >> pil)) {
+            cin.clear();
+            cin.ignore(1000, '\n');; 
+            continue; 
             }
+
+            if (pil == 1) {
+                while (true) {
+                    slowPrint("Kamu mencoba memanjat...", 5);
+                    delay(500);
+                    int gamble = rollAngka();
+                    cout << "[DEBUG] Angka Dadu Keluar: " << gamble << endl;
+
+                    if (gamble<70)
+                    {
+                        aturWarna(BRIGHT_RED);
+                        slowPrint("Kamu terpleset saat mencoba memanjat!", 30);
+                        p->kewarasanDamage(50);
+                        aturWarna(WHITE);
+
+                        if (p->kewarasan <= 0) return nullptr; // MATI AWKAKWKAKW
+
+                        cout << "\n=====================\n";
+                        cout << "Kewarasan: " << p->kewarasan << "%\n";
+                        cout << "1. Mencoba memanjatnya lagi...?\n";
+                        cout << "2. Nyerah...\n> ";
             
-        } else {
+                        int pil2;
+                        if (!(cin >> pil2)) {
+                            cin.clear();
+                            cin.ignore(1000, '\n');; 
+                            continue; 
+                        }
+
+                        if (pil2 == 1)
+                        {
+                            system("cls");
+                            cout << "[Mencoba lagi...]\n";
+                            continue;
+                        } else if (pil2 == 2) {
+                            break;
+                        } else {
+                            salahOpsi();
+                        }
+                    } else {
+                        aturWarna(GREEN);
+                        slowPrint("BERHASIL! Kamu berhasil melewati gerbang!", 30);
+                        aturWarna(WHITE);
+                        delay(1000);
+                
+                        // CONTOH: Lanjut ke area baru (misal Lantai 1)
+                        // return new LantaiSatu(); 
+                        
+                        // Atau kalau belum ada class-nya, tamatin aja dulu:
+                        slowPrint("Kamu lari keluar gedung... Kamu selamat!", 50);
+                        cout<<"[Enter untuk Keluar!]";
+                        cin.ignore(1000, '\n');
+                        cin.get();
+                        return nullptr;
+                    }
+                    
+                }
+            
+        } else if (pil == 2) {
             return new RuangProdi(false); 
+        } else {
+            salahOpsi();
         }
+        }
+      
     }
 
     Cerita* LorongPanjang::mainkan(Player* p)  {
@@ -360,6 +415,11 @@ public:
         isRunning = true;
         string trueName = getSystemUsername();
         player = new Player(trueName);
+    }
+
+    // Tambahkan ini (Destructor)
+    ~Game() {
+        delete player; // Hapus Player saat game ditutup
     }
 
     
