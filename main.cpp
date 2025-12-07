@@ -33,6 +33,7 @@ const int BRIGHT_RED = 12;
 const int GREEN = 2;
 const int BRIGHT_AQUA = 11;
 const int BLUE = 1;
+const int BRIGHT_YELLOW = 14;
 
 
 
@@ -112,10 +113,12 @@ class Player {
 public:
     string nama;
     int kewarasan; 
+    bool adaKunci;
 
     Player(string n) {
         nama = n;
         kewarasan = 100;
+        adaKunci = false;
     }
 
     bool cekWaras() { return kewarasan <= 0; }
@@ -354,12 +357,23 @@ class Parkiran : public Cerita {
         slowPrint("Terbiasa melewati lorong ini, tapi entah kenapa kamu waspada saat berjalan...", 30);
         slowPrint("Dan benar saja, gerbang tangga untuk menuju kebawah terkunci...", 30);
         delay(500);
+        aturWarna(BRIGHT_YELLOW);
+        slowPrint("Instingmu mengatakan kamu bisa membuka gerbang ini jika kamu menemukan sebuah kunci...", 30);
+        aturWarna(WHITE);
         slowPrint("Kamu berpikir untuk mencoba memanjatnya atau balik ke ruang prodi.", 30);
         
         while(true) {
             cout << "=====================\n";
-            cout << "1. Mencoba memanjatnya\n";
+            if (p->adaKunci == true)
+            {
+                aturWarna(GREEN);
+                cout << "1. Buka Gembok dengan Kunci (AMAN)\n";
+                aturWarna(WHITE);
+            } else {
+                cout << "1. Mencoba memanjatnya\n";
+            }
             cout << "2. Lari balik ke Ruang Prodi\n> ";
+            
 
             int pil;
 
@@ -371,6 +385,22 @@ class Parkiran : public Cerita {
             }
 
             if (pil == 1) {
+                if (p->adaKunci == true) {
+                // SKENARIO MENANG MUDAH (Pakai Kunci)
+                system("cls");
+                slowPrint("Kamu memasukkan kunci ke gembok berkarat itu...", 40);
+                delay(1000);
+                slowPrint("KLIK!", 10);
+                delay(500);
+                aturWarna(GREEN);
+                slowPrint("Gerbang terbuka lebar! Kamu lari menuruni tangga...", 30);
+                
+                // Tamat / Pindah Lantai
+                cout << "\n[SELAMAT! KAMU BERHASIL KABUR!]";
+                cin.ignore(1000, '\n');
+                cin.get();
+                return nullptr;
+            } else {
                 while (true) {
                     slowPrint("Kamu mencoba memanjat...", 5);
                     delay(500);
@@ -383,21 +413,22 @@ class Parkiran : public Cerita {
                         slowPrint("Kamu terpleset saat mencoba memanjat!", 30);
                         p->kewarasanDamage(50);
                         aturWarna(WHITE);
-
+                        
                         if (p->kewarasan <= 0) return nullptr; // MATI AWKAKWKAKW
-
+            
                         cout << "\n=====================\n";
                         cout << "Kewarasan: " << p->kewarasan << "%\n";
                         cout << "1. Mencoba memanjatnya lagi...?\n";
                         cout << "2. Nyerah...\n> ";
             
                         int pil2;
+                
                         if (!(cin >> pil2)) {
                             cin.clear();
                             cin.ignore(1000, '\n');; 
                             continue; 
                         }
-
+            
                         if (pil2 == 1)
                         {
                             system("cls");
@@ -424,8 +455,10 @@ class Parkiran : public Cerita {
                         cin.get();
                         return nullptr;
                     }
+                }                
+
                     
-                }
+            }
             
         } else if (pil == 2) {
             return new RuangProdi(false); 
@@ -437,22 +470,53 @@ class Parkiran : public Cerita {
     }
 
     Cerita* LorongPanjang::mainkan(Player* p)  {
-        system("cls");
-        cout << "[LOKASI: Lorong Panjang]\n";
-        cout << "Kewarasan: " << p->kewarasan << "%\n";
+    system("cls");
+    cout << "[LOKASI: UJUNG LORONG PANJANG]\n";
+    cout << "Kewarasan: " << p->kewarasan << "%\n";
 
-        slowPrint("Pintu terbuka berderit...", 30);
-        slowPrint("Di sini aman. Kamu menemukan peta.", 30);
+    // Cek dulu: Kalau udah punya kunci, jangan dimunculin lagi kuncinya
+    if (p->adaKunci == false) {
+        slowPrint("Di sudut gelap, kamu melihat pos satpam yang berantakan...", 30);
+        delay(500);
+        slowPrint("Ada mayat satpam terduduk kaku di sana.", 30);
         
-        cout << "\nSekarang mau ke mana?\n";
-        cout << "1. Balik ke Ruang Prodi Utama\n";
-        cout << "2. Tidur di sini (End Game)\n> ";
-        int pil;
-        cin >> pil;
+        while (true)
+        {
+            cout << "\n1. Periksa Mayat\n2. Jangan sentuh (Balik ke Prodi)\n> ";
+            int pil;
+            if (!(cin >> pil)) {
+                salahOpsi();
+                cin.clear(); 
+                cin.ignore(1000, '\n'); 
+                continue;
+            }
+            
+            if (pil == 1) {
+                slowPrint("Kamu memberanikan diri merogoh saku seragamnya...", 40);
+                delay(1000);
+                aturWarna(GREEN); // Warna Hijau = Item Didapat
+                cout << ">> KAMU MENEMUKAN KUNCI GERBANG BESI! <<\n";
+                aturWarna(WHITE);
+                
+                p->adaKunci = true;                        
+                slowPrint("(Sekarang kamu bisa membuka gerbang di Lorong Kanan!)", 30);
+                cout << "\n[Tekan Enter untuk kembali]";
+                cin.ignore(1000, '\n'); cin.get();
+                return new RuangProdi(false);
+            } else {
+                return new RuangProdi(false);
+            }
+            
+        }
         
-        if (pil == 1) return new RuangProdi(false); // MUTER BALIK KE DEPAN
-        else return nullptr; // TAMAT
+    } 
+    else {
+        slowPrint("Hanya ada mayat satpam yang sudah kamu periksa tadi.", 30);
+        slowPrint("Tidak ada apa-apa lagi di sini.", 30);
+        delay(1000);
+        return new RuangProdi(false);
     }
+}
 
 
 // --- CLASS GAME ---
