@@ -11,7 +11,7 @@ class Cerita;
 class RuangProdi;       
 class LorongKiri;
 class LorongKanan;
-class RuangKelas; 
+class LorongPanjang; 
 class Parkiran;
 
 // --- UTILITIES ---
@@ -30,7 +30,7 @@ void aturWarna(int colorCode) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), colorCode);
 }
 
-// Konstanta Warna (Biar gampang aja si ingat angkanya)
+// Konstanta Warna (biar lebih gampang ngatur warna daripada nulis angkanya)
 const int WHITE = 7;
 const int RED = 4;
 const int BRIGHT_RED = 12;
@@ -39,9 +39,10 @@ const int BLUE = 1;
 
 // Fungsi biar lambet print textnya
 void slowPrint(string text, int speed = 40) {
+
     for (char c : text) {
         cout << c;
-        delay(speed);
+        delay(speed); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
     }
     cout << endl;
 }
@@ -81,6 +82,7 @@ public:
     bool cekWaras() { return kewarasan <= 0; }
 
     void kewarasanDamage(int amount) {
+        cout<<"(Menerima damage sebesar: "<<amount<<" )"<<endl;
         kewarasan -= amount;
         if (kewarasan < 0) kewarasan = 0;
     }
@@ -115,7 +117,7 @@ public:
     
 };
 
-class RuangKelas : public Cerita {
+class LorongPanjang : public Cerita {
 public:
     Cerita* mainkan(Player* p) override;
 };
@@ -142,7 +144,7 @@ public:
             slowPrint("Wah, ajaib sekali pintunya masih terbuka di jam seperti ini...", 20);
             delay(100);
             slowPrint("\nKamu menengok ke kiri dan ke kanan, memandangi lorong yang gelap...", 10);
-            slowPrint("Entah kenapa... hari ini fakultas teknis keliatannya... kosong?", 10);
+            slowPrint("Entah kenapa... hari ini fakultas teknik keliatannya... kosong?", 10);
             slowPrint("Terlintas dalam pikiranmu hanya satu, yaitu pergi dari sini atau setidaknya pulang.", 10);
             slowPrint("Tujuanmu saat ini adalah mencapai sepeda motor yang biasa kamu pakai.", 10);
             delay(100);
@@ -181,18 +183,14 @@ public:
         slowPrint("Kamu berjalan menyusuri lorong kiri yang panjang...", 30);
         delay(1000);
 
-        // --- INI LOGIKA RNG DI BALIK LAYAR ---
-        // Kita kocok dadu 0 sampai 2 (Ada 3 kemungkinan)
         int eventAcak = rand() % 3; 
 
-        // --- Cek Hasil Kocokan ---
         switch (eventAcak) {
             
-            case 0: // EVENT 1: Suara Misterius (Horror Dikit)
+            case 0:
                 slowPrint("SRRKK... SREK...", 60);
                 delay(500);
                 cout << "Kamu mendengar suara seretan kaki di belakangmu.\n";
-                // Pilihan user merespon event ini
                 cout << "1. Menoleh\n2. Jalan terus (Cuek)\n> ";
                 int pil1;
                 cin >> pil1;
@@ -207,36 +205,49 @@ public:
                 break;
 
             case 1: 
-                aturWarna(RED);
-                slowPrint("Di ujung lorong... ada bayangan berdiri tegak.", 40);
-                aturWarna(WHITE);
+                slowPrint("Selama kamu berjalan, kamu sembari melihat sekelilingmu...", 40);
                 delay(1000);
-                slowPrint("Tunggu... itu cuma gantungan baju janitor.", 30);
-                cout << "(Helaan napas lega... Kewarasan pulih sedikit)\n";
-                p->healKewarasan(5);
+                aturWarna(BRIGHT_RED);
+                slowPrint("ADA SESUATU DARI KEJAUHAN DI LAPANGAN BASKET YANG TERLIHAT MENGHADAPMU", 80);
+                aturWarna(WHITE);
+                cout<<"=========================\n";
+                cout<< "1. Fokuskan matamu untuk melihat sosok itu lebih jelas lagi\n2. Jalan terus dengan pura-pura cuek\n> ";
+                int pil2;
+                cin >> pil2;
+                if (pil2 == 1) {
+                    delay(500);
+                    // jumpscarePhoto(); //Buat sebuah fungsi ini nanti ygy
+                    jumpScareSound();
+                    aturWarna(BRIGHT_RED);
+                    slowPrint("\nSOSOK ITU MENGHILANG SELAGI KAMU MEMFOKUSKAN MATAMU!", 70);
+                    p->kewarasanDamage(10);
+                    aturWarna(WHITE);
+                } else {
+                    slowPrint("Kamu mempercepat langkahmu.", 30);
+                }
+                delay(1000);
                 break;
 
-            case 2: // EVENT 3: Kosong (Aman)
-                slowPrint("Lorong ini sepi. Hanya ada debu beterbangan.", 30);
-                cout << "Kamu merasa sedikit tenang.\n";
+            case 2:
+                slowPrint("...Lorong ini sangat-sangat hening dan sepi.", 30);
                 break;
         }
 
-        // --- BAGIAN KELUAR DARI LORONG ---
-        // Setelah event selesai, lanjut ke narasi utama
         delay(1000);
+        slowPrint("Kamu berhenti di ujung lorong...");
+        slowPrint("Di sebelah kirimu adalah musholla untuk perempuan dengan gerbang terkunci,");
+        slowPrint("dan di sebelah kananmu adalah lorong panjang yang menunggumu...");
         cout << "\n=====================\n";
-        cout << "\nKamu sampai di ujung lorong. Ada pintu '2B'.\n";
-        cout << "1. Masuk Ruang Kelas\n";
-        cout << "2. Lari balik ke RuangProdi\n> ";
+        cout << "1. Lanjut ke kanan\n";
+        cout << "2. Lari balik ke Ruang Prodi\n> ";
         
         int pil;
         cin >> pil;
         
         if (pil == 1) {
-            return new RuangKelas(); // MAJU KE DEPAN
+            return new LorongPanjang();
         } else {
-            return new RuangProdi(false); // MUNDUR KE BELAKANG
+            return new RuangProdi(false);
         }
     }
 
@@ -261,17 +272,19 @@ public:
             slowPrint("Kamu mencoba memanjat...", 5);
             delay(500);
             int gamble = rollAngka();
+            cout << "[DEBUG] Angka Dadu Keluar: " << gamble << endl;
 
                 if (gamble<70)
                 {
                     aturWarna(BRIGHT_RED);
                     slowPrint("Kamu terpleset saat mencoba memanjat!", 30);
-                    p->kewarasanDamage(20);
+                    p->kewarasanDamage(50);
                     aturWarna(WHITE);
 
                     if (p->kewarasan <= 0) return nullptr; // MATI AWKAKWKAKW
 
                     cout << "\n=====================\n";
+                    cout << "Kewarasan: " << p->kewarasan << "%\n";
                     cout << "1. Mencoba memanjatnya lagi...?\n";
                     cout << "2. Lari balik ke Ruang Prodi\n> ";
         
@@ -295,8 +308,9 @@ public:
                     // return new LantaiSatu(); 
                     
                     // Atau kalau belum ada class-nya, tamatin aja dulu:
-                    slowPrint("Kamu lari keluar gedung... Kamu selamat! (ENTER UNTUK TAMAT)", 50);
-                    cout<<"";
+                    slowPrint("Kamu lari keluar gedung... Kamu selamat!", 50);
+                    cout<<"[Enter untuk Keluar!]";
+                    cin.ignore(1000, '\n');
                     cin.get();
                     return nullptr;
                 }
@@ -308,9 +322,9 @@ public:
         }
     }
 
-    Cerita* RuangKelas::mainkan(Player* p)  {
+    Cerita* LorongPanjang::mainkan(Player* p)  {
         system("cls");
-        cout << "[LOKASI: RUANG KELAS 2B]\n";
+        cout << "[LOKASI: Lorong Panjang]\n";
         cout << "Kewarasan: " << p->kewarasan << "%\n";
 
         slowPrint("Pintu terbuka berderit...", 30);
@@ -343,7 +357,6 @@ private:
 
 public:
     Game() {
-        srand(time(0)); // Seed random
         isRunning = true;
         string trueName = getSystemUsername();
         player = new Player(trueName);
@@ -405,15 +418,20 @@ public:
         if (player->cekWaras()) {
             aturWarna(RED);
             cout << "\n\n=== PIKIRANMU HANCUR ===\n";
+            cout << "CUUUPUU BANGET JIRRR.\n";
             cout << "Game Over.\n";
             aturWarna(WHITE);
             delay(2000);
+            cout<<"[Enter untuk Keluar!]";
+            cin.ignore(1000, '\n');
+            cin.get();
         }
     }
 };
 
 int main() {
-    system("title PROJECT: SENDIRI DI RUANG PRODI"); 
+    system("title PROJECT: SENDIRI DI RUANG PRODI ELEKTRO"); 
+    srand(time(0)); // Seed random
     
     Game myGame;
     myGame.start();
