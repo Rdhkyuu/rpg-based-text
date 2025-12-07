@@ -41,7 +41,7 @@ int rollAngka() {
 
 void salahOpsi() {
     aturWarna(BRIGHT_AQUA);
-    cout << "\nKamu salah opsi... liat lagi pilihannya...";
+    cout << "\nKamu salah opsi... liat lagi pilihannya...\n";
     aturWarna(WHITE);
 }
 
@@ -91,7 +91,9 @@ public:
     bool cekWaras() { return kewarasan <= 0; }
 
     void kewarasanDamage(int amount) {
+        aturWarna(BRIGHT_RED);
         cout<<"(Menerima damage sebesar: "<<amount<<" )"<<endl;
+        aturWarna(WHITE);
         kewarasan -= amount;
         if (kewarasan < 0) kewarasan = 0;
     }
@@ -116,7 +118,7 @@ public:
 
 // definis class dulu tapi blum diisi
 class RuangProdi : public Cerita {
-public:
+    public:
     bool cekStatusAlur;
     Cerita* mainkan(Player* p) override;
 
@@ -127,20 +129,25 @@ public:
 };
 
 class LorongPanjang : public Cerita {
-public:
+    public:
     Cerita* mainkan(Player* p) override;
 };
 
 class LorongKanan : public Cerita {
-public:
+    public:
     Cerita* mainkan(Player* p) override;
     
 };
 
 class LorongKiri : public Cerita {
-public:
+    public:
     Cerita* mainkan(Player* p) override;
    
+};
+
+class Parkiran : public Cerita {
+    public:
+    Cerita* mainkan(Player* p) override;
 };
 
     // isi dari masing masing class
@@ -173,9 +180,10 @@ public:
 
             int pil;
             if (!(cin >> pil)) {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            continue;
+                salahOpsi();
+                cin.clear();
+                cin.ignore(1000, '\n');
+                continue;
             }
 
             if (pil == 1) {
@@ -208,25 +216,34 @@ public:
             case 0:
                 slowPrint("SRRKK... SREK...", 60);
                 delay(500);
-                cout << "Kamu mendengar suara seretan kaki di belakangmu.\n";
-                cout << "1. Menoleh\n2. Jalan terus (Cuek)\n> ";
-                int pil1;
-                if (!(cin >> pil1)) {
-                cin.clear();
-                cin.ignore(1000, '\n');
-    
-                return new LorongKiri(); 
-                }
+                while (true) {
+                    cout << "Kamu mendengar suara seretan kaki di belakangmu.\n";
+                    cout << "1. Menoleh\n2. Jalan terus (Cuek)\n> ";
+                    int pil1;
+                    
+                    if (!(cin >> pil1)) {
+                        salahOpsi();
+                        cin.clear();
+                        cin.ignore(1000, '\n');
+                        continue;
+                    }
+                    
+                    if (pil1 == 1) {
+                        jumpScareSound();
+                        glitchEffect(p->nama);
+                        slowPrint("TIDAK ADA SIAPA-SIAPA!", 20);
+                        p->kewarasanDamage(10);
+                        break;
+                    } else if(pil1 == 2) {
+                        slowPrint("Kamu mempercepat langkahmu.", 30);
+                        break;
+                    } else {
+                        salahOpsi();
+                    }
 
-                if (pil1 == 1) {
-                    jumpScareSound();
-                    glitchEffect(p->nama);
-                    slowPrint("TIDAK ADA SIAPA-SIAPA!", 20);
-                    p->kewarasanDamage(10);
-                } else {
-                    slowPrint("Kamu mempercepat langkahmu.", 30);
                 }
                 break;
+
 
             case 1: 
                 slowPrint("Selama kamu berjalan, kamu sembari melihat sekelilingmu...", 40);
@@ -234,27 +251,37 @@ public:
                 aturWarna(BRIGHT_RED);
                 slowPrint("ADA SESUATU DARI KEJAUHAN DI LAPANGAN BASKET YANG TERLIHAT MENGHADAPMU", 80);
                 aturWarna(WHITE);
-                cout<<"=========================\n";
-                cout<< "1. Fokuskan matamu untuk melihat sosok itu lebih jelas lagi\n2. Jalan terus dengan pura-pura cuek\n> ";
-                int pil2;
                 
-                if (!(cin >> pil2)) {
-                    cin.clear(); cin.ignore(1000, '\n');
-                    return new LorongKiri();
+                while (true) {
+                    cout<<"=========================\n";
+                    cout<< "1. Fokuskan matamu untuk melihat sosok itu lebih jelas lagi\n2. Jalan terus dengan pura-pura cuek\n> ";
+                    int pil2;
+
+                    if (!(cin >> pil2)) {
+                        salahOpsi();
+                        cin.clear(); 
+                        cin.ignore(1000, '\n');
+                        continue;
+                    }
+                    if (pil2 == 1) {
+                        delay(500);
+                        // jumpscarePhoto(); //Buat sebuah fungsi ini nanti ygy
+                        jumpScareSound();
+                        aturWarna(BRIGHT_RED);
+                        slowPrint("\nSOSOK ITU MENGHILANG SELAGI KAMU MEMFOKUSKAN MATAMU!", 70);
+                        p->kewarasanDamage(10);
+                        aturWarna(WHITE);
+                        break;
+                    } else if (pil2 == 2) {
+                        slowPrint("Kamu mempercepat langkahmu.", 30);
+                        break; 
+                    } else {
+                        salahOpsi();
+                    }
+                    delay(1000);
                 }
-                if (pil2 == 1) {
-                    delay(500);
-                    // jumpscarePhoto(); //Buat sebuah fungsi ini nanti ygy
-                    jumpScareSound();
-                    aturWarna(BRIGHT_RED);
-                    slowPrint("\nSOSOK ITU MENGHILANG SELAGI KAMU MEMFOKUSKAN MATAMU!", 70);
-                    p->kewarasanDamage(10);
-                    aturWarna(WHITE);
-                } else {
-                    slowPrint("Kamu mempercepat langkahmu.", 30);
-                }
-                delay(1000);
                 break;
+                
 
             case 2:
                 slowPrint("...Lorong ini sangat-sangat hening dan sepi.", 30);
@@ -273,6 +300,7 @@ public:
         
             int pil3;
             if (!(cin >> pil3)) {
+                salahOpsi();
                 cin.clear();
                 cin.ignore(1000, '\n');
                 continue;
@@ -306,9 +334,10 @@ public:
             int pil;
 
             if (!(cin >> pil)) {
-            cin.clear();
-            cin.ignore(1000, '\n');; 
-            continue; 
+                salahOpsi();
+                cin.clear();
+                cin.ignore(1000, '\n');; 
+                continue; 
             }
 
             if (pil == 1) {
@@ -356,10 +385,10 @@ public:
                         delay(1000);
                 
                         // CONTOH: Lanjut ke area baru (misal Lantai 1)
-                        // return new LantaiSatu(); 
+                        // return new Parkiran(); 
                         
                         // Atau kalau belum ada class-nya, tamatin aja dulu:
-                        slowPrint("Kamu lari keluar gedung... Kamu selamat!", 50);
+                        slowPrint("Kamu selamat untuk saat ini...!", 50);
                         cout<<"[Enter untuk Keluar!]";
                         cin.ignore(1000, '\n');
                         cin.get();
