@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <fstream> // file
 #include <cstdlib> // Random & getenv
 #include <ctime>   // Time seed
 #include <windows.h> // warnaa cmd
@@ -75,6 +76,35 @@ void glitchEffect(string namaTarget) {
     cout << endl;
     aturWarna(WHITE);
  }
+
+ void textHantu() {
+    // 1. Ambil lokasi folder User (C:\Users\NamaKamu)
+    char* userPath = getenv("USERPROFILE");
+    string pathLengkap;
+    if (userPath != nullptr) {
+        // kalo dapet path
+        pathLengkap = string(userPath) + "\\Desktop\\JANGAN_BACA.txt";
+    } else {
+        // kalo ga dapet path mau gamau di directory yang sama
+        pathLengkap = "JANGAN_BACA.txt"; 
+    }
+    ofstream fileHantu(pathLengkap.c_str());
+    if (fileHantu.is_open()) {
+        fileHantu << "KENAPA KAMU MENINGGALKANKU SENDIRI DI SINI?\n";
+        fileHantu << "JANGAN PERNAH BUKA GAME INI LAGI.\n";
+        fileHantu << "AKU MELIHATMU DARI BALIK LAYAR.";
+        
+        fileHantu.close();
+
+        system("start \"\" \"img\\cuayo.jpg\"");
+    
+        string command = "notepad \"" + pathLengkap + "\"";
+        system(command.c_str());
+    } else {
+        // Gagal membuka file
+        cout << "Dih.... kamu beruntung kali ini...\n"; 
+    }
+}
 
 
 // --- CLASS PLAYER ---
@@ -347,7 +377,7 @@ class Parkiran : public Cerita {
                     int gamble = rollAngka();
                     cout << "[DEBUG] Angka Dadu Keluar: " << gamble << endl;
 
-                    if (gamble<70)
+                    if (gamble<100)
                     {
                         aturWarna(BRIGHT_RED);
                         slowPrint("Kamu terpleset saat mencoba memanjat!", 30);
@@ -510,6 +540,10 @@ public:
             cout << "CUUUPUU BANGET JIRRR.\n";
             cout << "Game Over.\n";
             aturWarna(WHITE);
+
+            slowPrint("\nMenyimpan sesuatu di Desktop-mu...", 50);
+            textHantu();
+
             delay(2000);
             cout<<"[Enter untuk Keluar!]";
             cin.ignore(1000, '\n');
