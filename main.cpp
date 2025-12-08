@@ -108,23 +108,61 @@ void glitchEffect(string namaTarget) {
     }
 }
 
+// Menggunakan MCI (MEDIA CONTROL INTERFACE)
+// Variabel Global untuk mengingat nama alias yang aktif
+string activeAlias = "bgm_theme"; 
 void playBGM(string namaFile) {
-    // SND_LOOP = Ulang terus
-    // SND_ASYNC = Game gak macet pas lagu main (Background process)
-    string path = "audio\\" + namaFile; // Otomatis masuk folder audio
-    PlaySoundA(path.c_str(), NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
+    // 1. Matikan SEMUA biar bersih
+    mciSendStringA("close all wait", NULL, 0, NULL);
+    
+    // --- PLAN A: Coba pakai alias utama ---
+    string cmdA = "open \"audio\\" + namaFile + "\" type mpegvideo alias bgm_theme";
+    MCIERROR err = mciSendStringA(cmdA.c_str(), NULL, 0, NULL);
+    
+    if (err == 0) {
+        // SUKSES PLAN A
+        activeAlias = "bgm_theme"; // Catat: Si A yang nyanyi
+        mciSendStringA("play bgm_theme repeat", NULL, 0, NULL);
+    } 
+    else {
+        // GAGAL PLAN A -> COBA PLAN B (Cadangan)
+        // Kita close dulu just in case
+        mciSendStringA("close bgm_theme wait", NULL, 0, NULL);
+        
+        string cmdB = "open \"audio\\" + namaFile + "\" type mpegvideo alias bgm_cadangan";
+        err = mciSendStringA(cmdB.c_str(), NULL, 0, NULL);
+        
+        if (err == 0) {
+            // SUKSES PLAN B
+            activeAlias = "bgm_cadangan"; // Catat: Si B yang nyanyi
+            mciSendStringA("play bgm_cadangan repeat", NULL, 0, NULL);
+        } else {
+            // GAGAL TOTAL (Dua-duanya error)
+            cout << "[AUDIO FATAL ERROR] BGM tidak bisa diputar sama sekali.\n";
+            // Gak perlu return, biarin aja hening daripada crash
+        }
+    }
 }
 
-// 2. Putar SFX (Sekali main)
+void pauseBGM() {
+    string cmd = "pause " + activeAlias;
+    mciSendStringA(cmd.c_str(), NULL, 0, NULL);
+}
+
+void resumeBGM() {
+    string cmd = "play " + activeAlias + " repeat"; 
+    mciSendStringA(cmd.c_str(), NULL, 0, NULL);
+}
+
+void stopBGM() {
+    string cmd = "close " + activeAlias;
+    mciSendStringA(cmd.c_str(), NULL, 0, NULL);
+}
+
 void playSFX(string namaFile) {
     // Gak pake SND_LOOP, jadi cuma bunyi sekali
     string path = "audio\\" + namaFile;
     PlaySoundA(path.c_str(), NULL, SND_FILENAME | SND_ASYNC);
-}
-
-// 3. Matikan Suara (Stop)
-void stopAudio() {
-    PlaySound(NULL, 0, 0);
 }
 
 
@@ -264,7 +302,7 @@ class Parkiran : public Cerita {
 
         int eventAcak = rand() % 3; 
 
-        switch (eventAcak) {
+        switch (1) {
             
             case 0:
                 slowPrint("SRRKK... SREK...", 60);
@@ -300,6 +338,7 @@ class Parkiran : public Cerita {
 
             case 1: 
                 slowPrint("Selama kamu berjalan, kamu sembari melihat sekelilingmu...", 40);
+                pauseBGM();
                 delay(1000);
                 aturWarna(BRIGHT_RED);
                 slowPrint("ADA SESUATU DARI KEJAUHAN DI LAPANGAN BASKET YANG TERLIHAT MENGHADAPMU", 80);
@@ -317,16 +356,19 @@ class Parkiran : public Cerita {
                         continue;
                     }
                     if (pil2 == 1) {
-                        delay(500);
+                        playSFX("sfx.wav");
+                        delay(3000);
                         // jumpscarePhoto(); //Buat sebuah fungsi ini nanti ygy
-                        jumpScareSound();
                         aturWarna(BRIGHT_RED);
-                        slowPrint("\nSOSOK ITU MENGHILANG SELAGI KAMU MEMFOKUSKAN MATAMU!", 70);
+                        slowPrint("\nSOSOK ITU MENGHILANG SELAGI KAMU MEMFOKUSKAN MATAMU!", 80);
                         p->kewarasanDamage(10);
+                        delay(5000);
+                        resumeBGM();
                         aturWarna(WHITE);
                         break;
                     } else if (pil2 == 2) {
                         slowPrint("Kamu mempercepat langkahmu.", 30);
+                        resumeBGM();
                         break; 
                     } else {
                         salahOpsi();
