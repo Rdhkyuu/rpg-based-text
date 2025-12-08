@@ -4,6 +4,7 @@
 #include <cstdlib> // Random & getenv
 #include <ctime>   // Time seed
 #include <windows.h> // warnaa cmd
+#include <mmsystem.h> // (Multimedia System)
 
 using namespace std;
 
@@ -53,7 +54,7 @@ void slowPrint(string text, int speed = 40) {
 
     for (char c : text) {
         cout << c;
-        delay(0); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
+        delay(speed); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
     }
     cout << endl;
 }
@@ -105,6 +106,25 @@ void glitchEffect(string namaTarget) {
         // Gagal membuka file
         cout << "Dih.... kamu beruntung kali ini...\n"; 
     }
+}
+
+void playBGM(string namaFile) {
+    // SND_LOOP = Ulang terus
+    // SND_ASYNC = Game gak macet pas lagu main (Background process)
+    string path = "audio\\" + namaFile; // Otomatis masuk folder audio
+    PlaySoundA(path.c_str(), NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
+}
+
+// 2. Putar SFX (Sekali main)
+void playSFX(string namaFile) {
+    // Gak pake SND_LOOP, jadi cuma bunyi sekali
+    string path = "audio\\" + namaFile;
+    PlaySoundA(path.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+}
+
+// 3. Matikan Suara (Stop)
+void stopAudio() {
+    PlaySound(NULL, 0, 0);
 }
 
 
@@ -619,6 +639,8 @@ public:
 int main() {
     system("title PROJECT: SENDIRI DI RUANG PRODI ELEKTRO"); 
     srand(time(0)); // Seed random
+
+    playBGM("bgm.wav");
     
     Game myGame;
     myGame.start();
