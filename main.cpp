@@ -54,7 +54,7 @@ void slowPrint(string text, int speed = 40) {
 
     for (char c : text) {
         cout << c;
-        delay(speed); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
+        delay(0); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
     }
     cout << endl;
 }
@@ -302,11 +302,14 @@ class Parkiran : public Cerita {
 
         int eventAcak = rand() % 3; 
 
-        switch (1) {
+        switch (eventAcak) {
             
             case 0:
-                slowPrint("SRRKK... SREK...", 60);
+                pauseBGM();
                 delay(500);
+                playSFX("scratch.wav");
+                slowPrint("SRRKK... SREK...", 20);
+                delay(2000);
                 while (true) {
                     cout << "Kamu mendengar suara seretan kaki di belakangmu.\n";
                     cout << "1. Menoleh\n2. Jalan terus (Cuek)\n> ";
@@ -320,13 +323,16 @@ class Parkiran : public Cerita {
                     }
                     
                     if (pil1 == 1) {
-                        jumpScareSound();
+                        playSFX("ambient.wav");
+                        delay(500);
                         glitchEffect(p->nama);
                         slowPrint("TIDAK ADA SIAPA-SIAPA!", 20);
                         p->kewarasanDamage(10);
+                        resumeBGM();
                         break;
                     } else if(pil1 == 2) {
                         slowPrint("Kamu mempercepat langkahmu.", 30);
+                        resumeBGM();
                         break;
                     } else {
                         salahOpsi();
@@ -448,11 +454,15 @@ class Parkiran : public Cerita {
 
             if (pil == 1) {
                 if (p->adaKunci == true) {
-                // SKENARIO MENANG MUDAH (Pakai Kunci)
+                // klo ada kunci
                 system("cls");
                 slowPrint("Kamu memasukkan kunci ke gembok berkarat itu...", 40);
                 delay(1000);
+                pauseBGM();
+                playSFX("correct.wav");
+                delay(1000);
                 slowPrint("KLIK!", 10);
+                resumeBGM();
                 delay(500);
                 aturWarna(GREEN);
                 slowPrint("Gerbang terbuka lebar! Kamu lari menuruni tangga...", 30);
@@ -464,14 +474,17 @@ class Parkiran : public Cerita {
                 return nullptr;
             } else {
                 while (true) {
+                    pauseBGM();
                     slowPrint("Kamu mencoba memanjat...", 5);
                     delay(500);
                     int gamble = rollAngka();
                     cout << "[DEBUG] Angka Dadu Keluar: " << gamble << endl;
 
-                    if (gamble<100)
+                    if (gamble<80)
                     {
                         aturWarna(BRIGHT_RED);
+                        playSFX("fail.wav");
+                        delay(500);
                         slowPrint("Kamu terpleset saat mencoba memanjat!", 30);
                         p->kewarasanDamage(50);
                         aturWarna(WHITE);
@@ -503,8 +516,10 @@ class Parkiran : public Cerita {
                         }
                     } else {
                         aturWarna(GREEN);
+                        playSFX("correct.wav");
                         slowPrint("BERHASIL! Kamu berhasil melewati gerbang!", 30);
                         aturWarna(WHITE);
+                        resumeBGM();
                         delay(1000);
                 
                         // CONTOH: Lanjut ke area baru (misal Lantai 1)
@@ -541,6 +556,7 @@ class Parkiran : public Cerita {
         slowPrint("Di sudut gelap, kamu melihat pos satpam yang berantakan...", 30);
         delay(500);
         slowPrint("Ada mayat satpam terduduk kaku di sana.", 30);
+        pauseBGM();
         
         while (true)
         {
@@ -556,9 +572,12 @@ class Parkiran : public Cerita {
             if (pil == 1) {
                 slowPrint("Kamu memberanikan diri merogoh saku seragamnya...", 40);
                 delay(1000);
-                aturWarna(GREEN); // Warna Hijau = Item Didapat
+                playSFX("correct.wav");
+                aturWarna(GREEN);
                 cout << ">> KAMU MENEMUKAN KUNCI GERBANG BESI! <<\n";
                 aturWarna(WHITE);
+                resumeBGM();
+                delay(1000);
                 
                 p->adaKunci = true;                        
                 slowPrint("(Sekarang kamu bisa membuka gerbang di Lorong Kanan!)", 30);
@@ -566,6 +585,8 @@ class Parkiran : public Cerita {
                 cin.ignore(1000, '\n'); cin.get();
                 return new RuangProdi(false);
             } else {
+                resumeBGM();
+                delay(1000);
                 return new RuangProdi(false);
             }
             
