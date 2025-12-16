@@ -59,13 +59,6 @@ void slowPrint(string text, int speed = 40) {
     cout << endl;
 }
 
-void jumpScareSound() {
-    // Beep(Frekuensi, Durasi milidetik)
-    Beep(300, 100); 
-    Beep(200, 100);
-    Beep(100, 500); 
-}
-
     // VFX Horror (Glitch) !!
 void glitchEffect(string namaTarget) {
     aturWarna(BRIGHT_RED);
@@ -104,7 +97,7 @@ void glitchEffect(string namaTarget) {
         system(command.c_str());
     } else {
         // Gagal membuka file
-        cout << "Dih.... kamu beruntung kali ini...\n"; 
+        cout << "Oh.... kamu beruntung kali ini...\n"; 
     }
 }
 
@@ -165,6 +158,102 @@ void playSFX(string namaFile) {
     PlaySoundA(path.c_str(), NULL, SND_FILENAME | SND_ASYNC);
 }
 
+void tampilMainMenu() {
+    system("cls");
+    aturWarna(RED); // Merah biar serem
+    
+    // Copy-paste dari website ASCII Generator (Pilih font 'Big' atau 'Doom')
+    // Gunakan R"( ... )" (Raw String) biar gak error kena backslash
+    cout << R"(
+  _____ _____ _       ___  ___  ___  ___ _____  ______ ______________  ___  ___  _____ _   _ 
+/  ___|  ___| |     / _ \ |  \/  | / _ \_   _| | ___ \  ___| ___ \  \/  | / _ \|_   _| \ | |
+\ `--.| |__ | |    / /_\ \| .  . |/ /_\ \| |   | |_/ / |__ | |_/ / .  . |/ /_\ \ | | |  \| |
+ `--. \  __|| |    |  _  || |\/| ||  _  || |   | ___ \  __||    /| |\/| ||  _  | | | | . ` |
+/\__/ / |___| |____| | | || |  | || | | || |   | |_/ / |___| |\ \| |  | || | | |_| |_| |\  |
+\____/\____/\_____/\_| |_/\_|  |_/\_| |_/\_/   \____/\____/\_| \_\_|  |_/\_| |_/\___/\_| \_/
+    )" << endl;
+    
+    aturWarna(WHITE);
+    cout << "\n\t      === SENDIRI DI RUANG PRODI ===\n";
+    cout << "\t        (Gunakan Headset untuk Imersi)\n\n";
+    
+    cout << "\t          1. MULAI TEROR\n";
+    cout << "\t          2. KELUAR (TAKUT?)\n";
+    cout << "\t          > ";
+
+}
+
+
+void tampilCredits() {
+    system("cls");
+    // playBGM("bgm_sedih.wav"); // Lagu ending
+    
+    string list[] = {
+        "        TERIMA KASIH TELAH BERMAIN        ",
+        " ",
+        "            --- CREATED BY ---            ",
+        "           Muhammad Ridho Septiansyah  ",
+        " ",
+        "           --- SPECIAL THANKS ---         ",
+        "             Bapak Daffa                ",
+        "               Air Putih              ",
+        " ",
+        "           --- THE END ---               "
+    };
+
+    // Loop buat print satu per satu
+    for (string s : list) {
+        cout << "\n\t" << s; // \t biar agak tengah
+        delay(800); // Jeda tiap baris
+    }
+    
+    cout << "\n\n\n";
+    system("pause");
+}
+
+void tampilkanGameOver() {
+    stopBGM(); 
+    // playSFX("jumpscare_final.wav"); // <--- Nyalakan kalau ada file suaranya
+    
+    system("cls");
+    aturWarna(BRIGHT_RED); // Merah Darah
+
+    cout << "\n\n";
+    cout << "\t   =================================\n";
+    cout << "\t        K E W A R A S A N   H A B I S\n";
+    cout << "\t   =================================\n";
+    
+    slowPrint("\n\t   Pandanganmu menggelap...", 50);
+    slowPrint("\n\t   Kamu bukan lagi dirimu sendiri...", 50);
+    slowPrint("\n\t   Kini, kamu adalah bagian dari PRODI ini selamanya.", 60);
+    
+    textHantu(); 
+    
+    cout << "\n\n\t   [ GAME OVER ]";
+    cout << "\n\t   Tekan Enter untuk keluar...";
+    cin.ignore(1000, '\n'); cin.get();
+    exit(0); // Matikan program
+}
+
+
+void tampilEnding() {
+    stopBGM(); 
+    // playBGM("bgm_ending.wav"); // <--- Kalau ada lagu sedih/lega
+    
+    system("cls");
+    aturWarna(BRIGHT_AQUA); // Warna tenang
+    
+    slowPrint("KLIK! Gembok terbuka...", 40);
+    delay(1000);
+    
+    slowPrint("Kamu mendorong pintu besi yang berat itu.", 40);
+    slowPrint("Angin malam yang dingin menerpa wajahmu.", 40);
+    slowPrint("Kamu berlari sekuat tenaga tanpa menoleh ke belakang...", 30);
+    
+    // Panggil Credits yang sudah kamu buat sebelumnya
+    tampilCredits();
+}
+
 
 // --- CLASS PLAYER ---
 class Player {
@@ -207,7 +296,7 @@ public:
     virtual ~Cerita() {} 
 };
 
-// definis class dulu tapi blum diisi
+// kerangka buat class dulu tapi blum diisi
 class RuangProdi : public Cerita {
     public:
     bool cekStatusAlur;
@@ -460,17 +549,7 @@ class Parkiran : public Cerita {
                 delay(1000);
                 pauseBGM();
                 playSFX("correct.wav");
-                delay(1000);
-                slowPrint("KLIK!", 10);
-                resumeBGM();
-                delay(500);
-                aturWarna(GREEN);
-                slowPrint("Gerbang terbuka lebar! Kamu lari menuruni tangga...", 30);
-                
-                // Tamat / Pindah Lantai
-                cout << "\n[SELAMAT! KAMU BERHASIL KABUR!]";
-                cin.ignore(1000, '\n');
-                cin.get();
+               tampilEnding();
                 return nullptr;
             } else {
                 while (true) {
@@ -480,10 +559,10 @@ class Parkiran : public Cerita {
                     int gamble = rollAngka();
                     cout << "[DEBUG] Angka Dadu Keluar: " << gamble << endl;
 
-                    if (gamble<80)
+                    if (gamble<100)
                     {
                         aturWarna(BRIGHT_RED);
-                        playSFX("fail.wav");
+                        playSFX("hurt.wav");
                         delay(500);
                         slowPrint("Kamu terpleset saat mencoba memanjat!", 30);
                         p->kewarasanDamage(50);
@@ -517,15 +596,15 @@ class Parkiran : public Cerita {
                     } else {
                         aturWarna(GREEN);
                         playSFX("correct.wav");
-                        slowPrint("BERHASIL! Kamu berhasil melewati gerbang!", 30);
+                        slowPrint("BERHASIL! Kamu berhasil memanjat gerbang!", 30);
                         aturWarna(WHITE);
                         resumeBGM();
                         delay(1000);
                 
-                        // CONTOH: Lanjut ke area baru (misal Lantai 1)
+                        // Prototype nanti buat lanjut cerita
                         // return new Parkiran(); 
                         
-                        // Atau kalau belum ada class-nya, tamatin aja dulu:
+                        // Tamat dulu..
                         slowPrint("Kamu selamat untuk saat ini...!", 50);
                         cout<<"[Enter untuk Keluar!]";
                         cin.ignore(1000, '\n');
@@ -632,7 +711,6 @@ public:
 
     void start() {
         Cerita* lokasiSekarang = new RuangProdi(true);
-        // --- INTRO ---
         system("cls");
         
         aturWarna(WHITE);
@@ -682,18 +760,7 @@ public:
 
         // --- GAME OVER ---
         if (player->cekWaras()) {
-            aturWarna(RED);
-            cout << "\n\n=== PIKIRANMU HANCUR ===\n";
-            cout << "Game Over.\n";
-            aturWarna(WHITE);
-
-            slowPrint("\nMenyimpan sesuatu di Desktop-mu...", 50);
-            textHantu();
-
-            delay(2000);
-            cout<<"[Enter untuk Keluar!]";
-            cin.ignore(1000, '\n');
-            cin.get();
+            tampilkanGameOver();
         }
     }
 };
@@ -702,8 +769,44 @@ int main() {
     system("title PROJECT: SENDIRI DI RUANG PRODI ELEKTRO"); 
     srand(time(0)); // Seed random
 
+    // --- LOGIKA MENU UTAMA ---
+    while(true) {
+        tampilMainMenu(); // Panggil fungsi gambar tadi
+        
+        int pilihanMenu;
+        if (!(cin >> pilihanMenu)) {
+            // Kalau user iseng masukin huruf
+            cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
+        }
+        
+        if (pilihanMenu == 1) {
+            slowPrint("Memuat. . .", 60);
+            cout << "\t\t [";
+            // Loop buat nambahin kotak-kotak loading
+            for(int i = 0; i < 20; i++) {
+                aturWarna(RED); // Bar-nya merah
+                cout << "|"; // Karakter bar
+                Sleep(100); // Tunda 100ms per balok (Total 2 detik)
+            }
+            
+            aturWarna(WHITE);
+            cout << "] 100%\n";
+            
+            delay(1000); // Jeda dikit pas udah penuh
+            break; // LANJUT MASUK GAME
+        } 
+        else if (pilihanMenu == 2) {
+            // User pilih EXIT
+            aturWarna(12);
+            slowPrint("Sampai ketemu kembali. . .", 60);
+            delay(1000);
+            return 0; // Matikan program
+        }
+    }
+
     playBGM("bgm.wav");
-    
     Game myGame;
     myGame.start();
     
