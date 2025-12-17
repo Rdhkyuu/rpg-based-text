@@ -48,13 +48,11 @@ void salahOpsi() {
     aturWarna(WHITE);
 }
 
-
-// Fungsi biar lambet print textnya
 void slowPrint(string text, int speed = 40) {
 
     for (char c : text) {
         cout << c;
-        delay(speed); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
+        delay(0); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
     }
     cout << endl;
 }
@@ -72,8 +70,23 @@ void glitchEffect(string namaTarget) {
     aturWarna(WHITE);
  }
 
+void bukaFoto(string namaFile) {
+    string command = "start \"\" \"img\\" + namaFile + "\"";
+    system(command.c_str());
+}
+
  void textHantu() {
-    // 1. Ambil lokasi folder User (C:\Users\NamaKamu)
+    // mencoba mengambil nama user windows
+    char* userChar = getenv("USERNAME");
+    string namaTarget;
+    
+    if (userChar != nullptr) {
+        namaTarget = string(userChar); // Jika dapet nama usernya
+    } else {
+        namaTarget = "KAMU"; // Backup kalau gagal
+    }
+
+    // 1. Ambil lokasi folder User (C:\Users\...)
     char* userPath = getenv("USERPROFILE");
     string pathLengkap;
     if (userPath != nullptr) {
@@ -85,19 +98,21 @@ void glitchEffect(string namaTarget) {
     }
     ofstream fileHantu(pathLengkap.c_str());
     if (fileHantu.is_open()) {
+        fileHantu << "HALO, " << namaTarget << "...\n\n"; 
         fileHantu << "KENAPA KAMU MENINGGALKANKU SENDIRI DI SINI?\n";
+        fileHantu << "AKU TAHU KAMU YANG MAIN, " << namaTarget << ".\n";
         fileHantu << "JANGAN PERNAH BUKA GAME INI LAGI.\n";
-        fileHantu << "AKU MELIHATMU DARI BALIK LAYAR.";
+        fileHantu << "AKU MELIHATMU DARI BALIK LAYAR.\n";
         
         fileHantu.close();
 
-        system("start \"\" \"img\\cuayo.jpg\"");
+        bukaFoto("cuayo.jpg");
     
         string command = "notepad \"" + pathLengkap + "\"";
         system(command.c_str());
     } else {
         // Gagal membuka file
-        cout << "Oh.... kamu beruntung kali ini...\n"; 
+        cout << "Oh....  " << namaTarget <<"kamu beruntung kali ini...\n"; 
     }
 }
 
@@ -211,9 +226,9 @@ void tampilCredits() {
     system("pause");
 }
 
-void tampilkanGameOver() {
+void tampilGameOver() {
     stopBGM(); 
-    // playSFX("jumpscare_final.wav"); // <--- Nyalakan kalau ada file suaranya
+    // playSFX("jumpscare_final.wav");
     
     system("cls");
     aturWarna(BRIGHT_RED); // Merah Darah
@@ -225,7 +240,7 @@ void tampilkanGameOver() {
     
     slowPrint("\n\t   Pandanganmu menggelap...", 50);
     slowPrint("\n\t   Kamu bukan lagi dirimu sendiri...", 50);
-    slowPrint("\n\t   Kini, kamu adalah bagian dari PRODI ini selamanya.", 60);
+    slowPrint("\n\t   Kini, kamu menyatu dengan 'mereka'.", 60);
     
     textHantu(); 
     
@@ -238,10 +253,10 @@ void tampilkanGameOver() {
 
 void tampilEnding() {
     stopBGM(); 
-    // playBGM("bgm_ending.wav"); // <--- Kalau ada lagu sedih/lega
+    // playBGM("bgm_ending.wav");
     
     system("cls");
-    aturWarna(BRIGHT_AQUA); // Warna tenang
+    aturWarna(BRIGHT_AQUA); 
     
     slowPrint("KLIK! Gembok terbuka...", 40);
     delay(1000);
@@ -250,20 +265,18 @@ void tampilEnding() {
     slowPrint("Angin malam yang dingin menerpa wajahmu.", 40);
     slowPrint("Kamu berlari sekuat tenaga tanpa menoleh ke belakang...", 30);
     
-    // Panggil Credits yang sudah kamu buat sebelumnya
+  
     tampilCredits();
 }
 
 
-// --- CLASS PLAYER ---
+// Class Player
 class Player {
 public:
-    string nama;
     int kewarasan; 
     bool adaKunci;
 
-    Player(string n) {
-        nama = n;
+    Player() {
         kewarasan = 100;
         adaKunci = false;
     }
@@ -284,6 +297,8 @@ public:
     }
 };
 
+
+// Class Cerita dan anakannya
 class Cerita {
 public:
     // Virtual Function: Ini adalah "Lubang Kunci" yang akan diisi berbeda-beda oleh anaknya.
@@ -341,10 +356,10 @@ class Parkiran : public Cerita {
             delay(100);
             slowPrint("\nKamu menengok ke kiri dan ke kanan, memandangi lorong yang gelap...", 10);
             slowPrint("Entah kenapa... hari ini fakultas teknik keliatannya... kosong?", 10);
-            slowPrint("Terlintas dalam pikiranmu hanya satu, yaitu pergi dari sini atau setidaknya pulang.", 10);
-            slowPrint("Tujuanmu saat ini adalah mencapai sepeda motor yang biasa kamu pakai.", 10);
+            slowPrint("Terlintas dalam pikiranmu hanya satu, yaitu pergi dari sini.", 10);
+            slowPrint("Tujuanmu bisa melewati lorong kanan, ataupun melewati lorong kiri...", 10);
             delay(100);
-            slowPrint("\nDi lorong sebelah kanan, itu adalah jalan yang tercepat untuk mencapai parkiran... tapi entah kenapa kamu yakin bahwa gerbang di lorong itu terkunci...", 10);
+            slowPrint("\nDi lorong sebelah kanan, itu adalah jalan yang tercepat untuk keluar dari sini... tapi entah kenapa kamu yakin bahwa gerbang di lorong itu terkunci...", 10);
             slowPrint("Sedangkan di lorong sebelah kiri, itu adalah lorong yang biasanya masih dibuka hingga larut malam walaupun sedikit agak jauh...", 10);
         } else {
             slowPrint("Kamu kembali lagi ke ruang prodi...", 5);
@@ -391,7 +406,7 @@ class Parkiran : public Cerita {
 
         int eventAcak = rand() % 3; 
 
-        switch (eventAcak) {
+        switch (1) {
             
             case 0:
                 pauseBGM();
@@ -414,7 +429,6 @@ class Parkiran : public Cerita {
                     if (pil1 == 1) {
                         playSFX("ambient.wav");
                         delay(500);
-                        glitchEffect(p->nama);
                         slowPrint("TIDAK ADA SIAPA-SIAPA!", 20);
                         p->kewarasanDamage(10);
                         resumeBGM();
@@ -436,7 +450,8 @@ class Parkiran : public Cerita {
                 pauseBGM();
                 delay(1000);
                 aturWarna(BRIGHT_RED);
-                slowPrint("ADA SESUATU DARI KEJAUHAN DI LAPANGAN BASKET YANG TERLIHAT MENGHADAPMU", 80);
+                slowPrint("ADA SESUATU DI LAPANGAN BASKET YANG TERLIHAT MENGHADAPMU", 80);
+                system("start \"\" \"img\\basket.png\"");
                 aturWarna(WHITE);
                 
                 while (true) {
@@ -453,7 +468,7 @@ class Parkiran : public Cerita {
                     if (pil2 == 1) {
                         playSFX("sfx.wav");
                         delay(3000);
-                        // jumpscarePhoto(); //Buat sebuah fungsi ini nanti ygy
+                        bukaFoto("basket.png");
                         aturWarna(BRIGHT_RED);
                         slowPrint("\nSOSOK ITU MENGHILANG SELAGI KAMU MEMFOKUSKAN MATAMU!", 80);
                         p->kewarasanDamage(10);
@@ -549,7 +564,7 @@ class Parkiran : public Cerita {
                 delay(1000);
                 pauseBGM();
                 playSFX("correct.wav");
-               tampilEnding();
+                tampilEnding();
                 return nullptr;
             } else {
                 while (true) {
@@ -605,10 +620,7 @@ class Parkiran : public Cerita {
                         // return new Parkiran(); 
                         
                         // Tamat dulu..
-                        slowPrint("Kamu selamat untuk saat ini...!", 50);
-                        cout<<"[Enter untuk Keluar!]";
-                        cin.ignore(1000, '\n');
-                        cin.get();
+                        tampilEnding();
                         return nullptr;
                     }
                 }                
@@ -688,23 +700,18 @@ private:
     bool isRunning;
     Cerita* lokasiAktif;
 
-    string getSystemUsername() {
-        // Mencoba mengambil nama user Windows (breaking 4th wall!!)
-        char* username = getenv("USERNAME"); 
-        if (username) return string(username);
-        return "Tamu tak dikenal"; 
-    }
 
 public:
     Game() {
         isRunning = true;
-        string trueName = getSystemUsername();
-        player = new Player(trueName);
+        player = new Player();
     }
 
-    // Tambahkan ini (Destructor)
+    // Destructor
     ~Game() {
         delete player; // Hapus Player saat game ditutup
+        // Pastikan audio mati total saat game ditutup bersih
+        mciSendStringA("close all", NULL, 0, NULL);
     }
 
     
@@ -721,11 +728,14 @@ public:
         slowPrint("Dan entah kenapa pada saat itu, aku tertidur...", 5);
         delay(1000);
         cout << "\n[Tekan Enter untuk lanjut...]";
+        cin.clear();
+        cin.ignore(1000, '\n');
         cin.get();
 
         system("cls");
         slowPrint("Terbangun, ruangan telah sepi... dengan kondisi di luar yang sudah gelap gulita.", 50);
         slowPrint("Kamu melihat sekelilingmu, tidak ada siapapun kecuali dirimu.", 50);
+        slowPrint("Anehnya juga... kenapa semuanya terlihat berantakan..?", 50);
         slowPrint("Berpikir dalam hati, apakah aku ditinggalkan begitu saja?", 50);
         delay(2000);
         cout << "\n[Tekan Enter untuk lanjut...]";
@@ -760,7 +770,7 @@ public:
 
         // --- GAME OVER ---
         if (player->cekWaras()) {
-            tampilkanGameOver();
+            tampilGameOver();
         }
     }
 };
