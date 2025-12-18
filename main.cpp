@@ -314,13 +314,15 @@ class Player {
 public:
     int kewarasan; 
     bool adaKunci;
+    bool isMenyerah;
 
     Player() {
         kewarasan = 100;
         adaKunci = false;
+        isMenyerah = false;
     }
 
-    bool cekWaras() { return kewarasan <= 0; }
+    bool cekWaras() { return kewarasan > 0; }
 
     void kewarasanDamage(int amount) {
         aturWarna(BRIGHT_RED);
@@ -818,37 +820,37 @@ public:
 
         
             // --- GAME LOOP ---
-            while (isRunning && !player->cekWaras()) {
+            while (isRunning && player->cekWaras()) {
 
                 if (lokasiSekarang == nullptr) {
                 isRunning = false; // Kalau gak ada lokasi atur isRunningnya
                 break;
                 }
-                // 1. JALANKAN LOKASI SAAT INI
+                // 1. jalanin dulu lokasi saat ini
                 // Dan TANGKAP lokasi berikutnya yang dilempar oleh return
                 Cerita* lokasiSelanjutnya = lokasiSekarang->mainkan(player);
-                // 2. HAPUS LOKASI LAMA (Memory Management)
+                // 2. hapus lokasi lamaa (Memory Management)
                 delete lokasiSekarang;
 
-                // 3. PINDAH KE LOKASI BARU
+                // 3. pindah ke lokasi baru
                 lokasiSekarang = lokasiSelanjutnya;
             
                 
             }
 
-            // --- GAME OVER ---
-            if (player->cekWaras()) {
+            // gane over
+            if (!player->cekWaras()) {
                 tampilGameOver();
             }
 
             // player memutuskan exit manual
-            if (!player->cekWaras() && !isRunning) {
+            if (player->isMenyerah) {
                 break; 
             }
 
             if (lokasiSekarang != nullptr) delete lokasiSekarang;
         } while (tampilMenuRetry()==1);
-        slowPrint("Sampai ketemu kembali. . .", 60);
+        slowPrint("Sampai ketemu kembali. . . (debug exit diluar while)", 60);
         delay(1000);
     }
 };
