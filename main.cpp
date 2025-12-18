@@ -15,7 +15,6 @@ void delay(int ms) {
     Sleep(ms);
 }
 
-// Fungsi Warna 
 void aturWarna(int colorCode) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), colorCode);
 }
@@ -104,7 +103,7 @@ void bukaFoto(string namaFile) {
         
         fileHantu.close();
 
-        bukaFoto("cuayo.jpg");
+        bukaFoto("jumpscare.jpg");
     
         string command = "notepad \"" + pathLengkap + "\"";
         system(command.c_str());
@@ -114,6 +113,51 @@ void bukaFoto(string namaFile) {
     }
 }
 
+void textEnding() {
+    char* userChar = getenv("USERNAME");
+    string namaTarget;
+    
+    if (userChar != nullptr) {
+        namaTarget = string(userChar);
+    } else {
+        namaTarget = "KAMU";
+    }
+
+    // 1. Ambil lokasi folder User (C:\Users\...)
+    char* userPath = getenv("USERPROFILE");
+    string pathLengkap;
+    if (userPath != nullptr) {
+        // kalo dapet path
+        pathLengkap = string(userPath) + "\\Desktop\\Terimakasih.txt";
+    } else {
+        // kalo ga dapet path mau gamau di directory yang sama
+        pathLengkap = "Terimakasih.txt"; 
+    }
+    ofstream fileEnding(pathLengkap.c_str());
+    if (fileEnding.is_open()) {
+        fileEnding << "Halo, " << namaTarget << "...\n\n"; 
+        fileEnding << "Entah bagaimana kamu bisa menemukan game ini...\n"; 
+        fileEnding << "Apresiasi tidak bisa dituliskan, hanya bisa dirasakan.\n\n";
+
+        fileEnding << "File ini adalah bukti bahwa kamu pernah ada di sini.\n"; 
+        fileEnding << "Bahwa kamu pernah berjuang, dan kamu menang.\n\n"; 
+
+        fileEnding << "Simpan foto ini baik-baik ya.\n";
+        fileEnding << "Selamat melanjutkan hidup.\n\n";
+
+        fileEnding << "Tidak usah memikirkan player, dia sudah bebas... untuk saat ini.";
+        fileEnding.close();
+
+        bukaFoto("happy.jpg");
+    
+        string command = "notepad \"" + pathLengkap + "\"";
+        system(command.c_str());
+    } else {
+        // Gagal membuka file
+        cout << "Oh....  " << namaTarget <<"maaf appresiasiku tidak tersampaikan...\n"; 
+    }
+    
+}
 // Menggunakan MCI (MEDIA CONTROL INTERFACE)
 // Variabel Global untuk mengingat nama alias yang aktif
 string activeAlias = "bgm_theme"; 
@@ -222,8 +266,8 @@ void tampilCredits() {
     }
     
     cout << "\n\n\n";
-
     cout << "\n\t   [Tekan Enter untuk lanjut...]";
+    
     cin.ignore(1000, '\n'); 
     cin.get();
 }
@@ -268,6 +312,8 @@ void tampilEnding() {
     slowPrint("Angin malam yang dingin menerpa wajahmu.", 40);
     slowPrint("Kamu berlari sekuat tenaga tanpa menoleh ke belakang...", 30);
     
+    textEnding();
+
     cout << "\n\t   [Tekan Enter untuk lanjut...]";
     cin.ignore(1000, '\n'); 
     cin.get();
@@ -277,6 +323,9 @@ void tampilEnding() {
 
 int tampilMenuRetry() {
     int opsi;
+    slowPrint("Membersihkan layar...");
+    delay(2000);
+    system("cls");
     
     aturWarna(WHITE);
     cout << "\n====================================\n";
@@ -386,18 +435,19 @@ class Parkiran : public Cerita {
             slowPrint("Setelah kamu mengetahui kamu sendirian di ruang prodi, kamu bergegas untuk keluar dari kelas...", 20);
             slowPrint("Wah, ajaib sekali pintunya masih terbuka di jam seperti ini...", 20);
             delay(1000);
-            slowPrint("\nKamu menengok ke kiri dan ke kanan, memandangi lorong yang gelap...", 10);
-            slowPrint("Entah kenapa... hari ini fakultas teknik keliatannya... kosong?", 10);
+            slowPrint("\nKamu menengok ke kiri dan ke kanan, memandangi lorong yang gelap...", 25);
+            slowPrint("Entah kenapa... hari ini fakultas teknik keliatannya... kosong?", 25);
             aturWarna(BRIGHT_YELLOW);
-            slowPrint("Terlintas dalam pikiranmu hanya satu, yaitu pergi dari sini.", 10);
+            slowPrint("Terlintas dalam pikiranmu hanya satu, yaitu pergi dari sini.", 30);
             aturWarna(WHITE);
-            slowPrint("Tujuanmu bisa melewati lorong kanan, ataupun melewati lorong kiri...", 10);
+            delay(2000);
+            slowPrint("Tujuanmu bisa melewati lorong kanan, ataupun melewati lorong kiri...", 20);
             delay(1000);
-            slowPrint("\nDi lorong sebelah kanan, itu adalah jalan yang tercepat untuk keluar dari sini,", 10);
-            slowPrint("tapi entah kenapa kamu yakin bahwa gerbang di lorong itu terkunci...", 10);
+            slowPrint("\nDi lorong sebelah kanan, itu adalah jalan yang tercepat untuk keluar dari sini,", 20);
+            slowPrint("tapi entah kenapa kamu yakin bahwa gerbang di lorong itu terkunci...", 20);
             bukaFoto("lorongkanan.png");
             delay(5000);
-            slowPrint("Sedangkan di lorong sebelah kiri, itu adalah lorong yang biasanya masih dibuka hingga larut malam walaupun sedikit agak jauh...", 10);
+            slowPrint("\nSedangkan di lorong sebelah kiri, itu adalah lorong yang biasanya masih dibuka hingga larut malam walaupun sedikit agak jauh...", 20);
             bukaFoto("lorongkiri.png");
             delay(5000);
         } else {
@@ -501,6 +551,7 @@ class Parkiran : public Cerita {
                 aturWarna(BRIGHT_RED);
                 slowPrint("ADA SESUATU DI LAPANGAN BASKET YANG TERLIHAT MENGHADAPMU", 80);
                 bukaFoto("basket.png");
+                delay(6500);
                 aturWarna(WHITE);
                 
                 while (true) {
@@ -542,7 +593,7 @@ class Parkiran : public Cerita {
         }
 
         delay(1000);
-        slowPrint("Kamu berhenti di ujung lorong...");
+        slowPrint("\nKamu berhenti di ujung lorong...");
         slowPrint("Di sebelah kirimu adalah musholla untuk perempuan dengan gerbang terkunci,");
         slowPrint("dan di sebelah kananmu adalah lorong panjang yang menunggumu...");
         bukaFoto("lorongpanjang.png");
@@ -577,7 +628,7 @@ class Parkiran : public Cerita {
         cout << "[LOKASI: LORONG KANAN]\n";
         cout << "Kewarasan: " << p->kewarasan << "%\n";
         if (p->adaKunci == true) {
-            slowPrint("Kamu kembali berdiri di depan gerbang besi yang kokoh itu...", 30);
+            slowPrint("Kamu berdiri di depan gerbang besi yang kokoh itu...", 30);
             delay(500);
             
             aturWarna(BRIGHT_YELLOW);
@@ -591,6 +642,7 @@ class Parkiran : public Cerita {
             aturWarna(BRIGHT_YELLOW);
             slowPrint("Instingmu mengatakan kamu bisa membuka gerbang ini jika kamu menemukan sebuah kunci...", 30);
             aturWarna(WHITE);
+            delay(5000);
             slowPrint("Kamu berpikir untuk mencoba memanjatnya atau balik ke ruang prodi.", 30);
         }
         while(true) {
@@ -631,9 +683,9 @@ class Parkiran : public Cerita {
                     slowPrint("Kamu mencoba memanjat...", 5);
                     delay(500);
                     int gamble = rollAngka();
-                    cout << "[DEBUG] Angka Dadu Keluar: " << gamble << endl;
+                    // cout << "[DEBUG] Angka Dadu Keluar: " << gamble << endl;
 
-                    if (gamble<100)
+                    if (gamble<85)
                     {
                         aturWarna(BRIGHT_RED);
                         playSFX("hurt.wav");
@@ -644,6 +696,8 @@ class Parkiran : public Cerita {
                         
                         if (p->kewarasan <= 0) return nullptr; // mati...
             
+                        resumeBGM();
+                        delay(1000);
                         cout << "\n=====================\n";
                         cout << "Kewarasan: " << p->kewarasan << "%\n";
                         cout << "1. Mencoba memanjatnya lagi...?\n";
@@ -793,9 +847,9 @@ public:
             aturWarna(WHITE);
             slowPrint("Senin, 12 Desember 2025...", 20);
             delay(1000);
-            slowPrint("Pada saat itu, sedang dalam pelajaran kalkulus...", 5);
+            slowPrint("Pada saat itu, sedang dalam pelajaran kalkulus...", 15);
             delay(1000);
-            slowPrint("Dan entah kenapa pada saat itu, aku tertidur...", 5);
+            slowPrint("Dan entah kenapa pada saat itu, aku tertidur...", 15);
             delay(1000);
             cout << "\n[Tekan Enter untuk lanjut...]";
             cin.clear();
@@ -805,8 +859,9 @@ public:
             system("cls");
             slowPrint("Terbangun, ruangan telah sepi... dengan kondisi di luar yang sudah gelap gulita.", 50);
             slowPrint("Kamu melihat sekelilingmu, tidak ada siapapun kecuali dirimu.", 50);
-            slowPrint("Anehnya juga... kenapa semuanya terlihat berantakan..?", 50);
+            slowPrint("Anehnya juga... kenapa semuanya terlihat berantakan..?", 30);
             bukaFoto("prodi.png");
+            delay(3000);
             slowPrint("Berpikir dalam hati, apakah aku ditinggalkan begitu saja?", 50);
             delay(2000);
             cout << "\n[Tekan Enter untuk lanjut...]";
@@ -847,8 +902,10 @@ public:
 
             if (lokasiSekarang != nullptr) delete lokasiSekarang;
         } while (tampilMenuRetry()==1);
-        slowPrint("Sampai ketemu kembali. . . (debug exit diluar while)", 60);
-        delay(1000);
+        aturWarna(BRIGHT_AQUA);
+        slowPrint("\nSampai ketemu kembali. . .", 60);
+        aturWarna(WHITE);
+        delay(3000);
     }
 };
 
