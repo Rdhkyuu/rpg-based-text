@@ -9,14 +9,6 @@
 
 using namespace std;
 
-// Deklarasi paling awal
-class Cerita;
-class RuangProdi;       
-class LorongKiri;
-class LorongKanan;
-class LorongPanjang; 
-class Parkiran;
-
 // --- UTILITIES ---
 
 void delay(int ms) {
@@ -351,7 +343,7 @@ public:
     virtual ~Cerita() {} 
 };
 
-// kerangka buat class dulu tapi blum diisi
+// kerangka buat masing-masing anak class-an dari cerita dulu tapi fungsi mainkan blum diisi
 class RuangProdi : public Cerita {
     public:
     bool cekStatusAlur;
@@ -385,7 +377,7 @@ class Parkiran : public Cerita {
     Cerita* mainkan(Player* p) override;
 };
 
-    // isi dari masing masing class
+    // isi dari masing masing fungsi mainkan di class anakan cerita
     Cerita* RuangProdi::mainkan(Player* p) {
         system("cls"); 
         aturWarna(WHITE);
@@ -444,6 +436,8 @@ class Parkiran : public Cerita {
                 aturWarna(BRIGHT_RED);
                 slowPrint("BERHARAP SEMUA INI HANYA MIMPI");
                 aturWarna(WHITE);
+                p->isMenyerah = true;
+                delay(3000);
                 return nullptr; 
             } else {
                 salahOpsi();
@@ -816,6 +810,8 @@ public:
             slowPrint("Berpikir dalam hati, apakah aku ditinggalkan begitu saja?", 50);
             delay(2000);
             cout << "\n[Tekan Enter untuk lanjut...]";
+            cin.clear();
+            cin.ignore(1000, '\n');
             cin.get();
 
         
@@ -826,6 +822,7 @@ public:
                 isRunning = false; // Kalau gak ada lokasi atur isRunningnya
                 break;
                 }
+
                 // 1. jalanin dulu lokasi saat ini
                 // Dan TANGKAP lokasi berikutnya yang dilempar oleh return
                 Cerita* lokasiSelanjutnya = lokasiSekarang->mainkan(player);
@@ -877,7 +874,7 @@ int main() {
             for(int i = 0; i < 20; i++) {
                 aturWarna(RED); // Bar-nya merah
                 cout << "|"; // Karakter bar
-                Sleep(100); // Tunda 100ms per balok (Total 2 detik)
+                Sleep(100); // 
             }
             
             aturWarna(WHITE);
@@ -891,7 +888,7 @@ int main() {
             // User pilih EXIT
             aturWarna(12);
             slowPrint("Sampai ketemu kembali. . .", 60);
-            delay(1000);
+            delay(3000);
             return 0; // Matikan program
         }
     }
