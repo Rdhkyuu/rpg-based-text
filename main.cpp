@@ -287,11 +287,11 @@ int tampilMenuRetry() {
     cout << "====================================\n";
     cout << " Pilihan >> ";
     
-    // Validasi input biar gak error kalau user masukin huruf
+    // validasi kalo dimasukin huruf
     if (!(cin >> opsi)) {
         cin.clear(); // Hapus flag error
         cin.ignore(1000, '\n'); // Buang input sampah
-        opsi = 2; // Default ke Keluar aja kalau input ngaco
+        opsi = 2; // default jadi kembalian dua aja
     } else {
         // Bersihkan sisa enter biar aman untuk next loop
         cin.ignore(1000, '\n'); 
@@ -343,7 +343,7 @@ public:
     virtual ~Cerita() {} 
 };
 
-// kerangka buat masing-masing anak class-an dari cerita dulu tapi fungsi mainkan blum diisi
+// deklarasi class dulu tapi implementasi fungsi setelahnya 
 class RuangProdi : public Cerita {
     public:
     bool cekStatusAlur;
@@ -757,7 +757,7 @@ class Parkiran : public Cerita {
 }
 
 
-// --- CLASS GAME ---
+// class game
 class Game {
 private:
     Player* player;
@@ -856,7 +856,7 @@ int main() {
     system("title PROJECT: SENDIRI DI RUANG PRODI ELEKTRO"); 
     srand(time(0)); // Seed random
 
-    // --- LOGIKA MENU UTAMA ---
+    //  meenu utama
     while(true) {
         tampilMainMenu(); 
         
