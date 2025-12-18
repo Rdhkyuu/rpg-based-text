@@ -114,6 +114,7 @@ void bukaFoto(string namaFile) {
 }
 
 void textEnding() {
+    // sama seperti textHantu() tinggal diubah isinya saja menyesuaikan kebutuhan
     char* userChar = getenv("USERNAME");
     string namaTarget;
     
@@ -123,14 +124,11 @@ void textEnding() {
         namaTarget = "KAMU";
     }
 
-    // 1. Ambil lokasi folder User (C:\Users\...)
     char* userPath = getenv("USERPROFILE");
     string pathLengkap;
     if (userPath != nullptr) {
-        // kalo dapet path
         pathLengkap = string(userPath) + "\\Desktop\\Terimakasih.txt";
     } else {
-        // kalo ga dapet path mau gamau di directory yang sama
         pathLengkap = "Terimakasih.txt"; 
     }
     ofstream fileEnding(pathLengkap.c_str());
@@ -153,7 +151,6 @@ void textEnding() {
         string command = "notepad \"" + pathLengkap + "\"";
         system(command.c_str());
     } else {
-        // Gagal membuka file
         cout << "Oh....  " << namaTarget <<"maaf appresiasiku tidak tersampaikan...\n"; 
     }
     
