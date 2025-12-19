@@ -11,3 +11,5 @@ Langkah-langkah inisialisasi:
    https://code.visualstudio.com/docs/languages/cpp
 3. Lakukan Build terhadap Program.
 4. Jalankan dan Enjoy!
+
+https://github.com/Rdhkyuu/rpg-based-text
