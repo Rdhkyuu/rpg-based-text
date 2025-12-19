@@ -110,7 +110,7 @@ void bukaFoto(string namaFile) {
         system(command.c_str());
     } else {
         // Gagal membuka file
-        cout << "Oh....  " << namaTarget <<"kamu beruntung kali ini...\n"; 
+        cout << "Oh....  " << namaTarget <<" kamu beruntung kali ini...\n"; 
     }
 }
 
