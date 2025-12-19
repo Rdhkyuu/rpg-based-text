@@ -1,6 +1,6 @@
 # OVERVIEW
 
-Program ini adalah permainan bergenre Narrative Text-Based RPG dengan tema horor psikologis. Berlatar di lingkungan kampus (Prodi Teknik Elektro), pemain dituntut untuk menyelesaikan objective sambil menjaga status kesehatan mental (Sanity). 
+Program ini adalah permainan bergenre Narrative Text-Based RPG dengan tema horor. Berlatar di lingkungan kampus (Prodi Teknik Elektro), pemain dituntut untuk menyelesaikan objective sambil menjaga status kesehatan mental/kewarasan. 
 
 Program dibangun menggunakan bahasa C++ dengan paradigma Object-Oriented Programming (OOP), mengimplementasikan konsep Class, Inheritance (Pewarisan), dan Polymorphism.
 
