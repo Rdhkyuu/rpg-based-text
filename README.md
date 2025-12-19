@@ -12,4 +12,6 @@ Langkah-langkah inisialisasi:
 3. Lakukan Build terhadap Program.
 4. Jalankan dan Enjoy!
 
+
+Made by: Ridho Septi
 https://github.com/Rdhkyuu/rpg-based-text
