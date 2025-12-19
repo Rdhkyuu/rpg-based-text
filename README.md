@@ -12,6 +12,10 @@ Langkah-langkah inisialisasi:
 3. Lakukan Build terhadap Program.
 4. Jalankan dan Enjoy!
 
+### PENTING!  
+Karena di dalamm program menggunakan library multimedia system, untuk yang tidak memakai Visual Studio Code diharapkan sudah melakukan linking terhadap library "winmm".  
+Sesuaikan dengan IDE masing-masing bagaimana cara melakukan linkingnya.
+
 
 Made by: Ridho Septi
 https://github.com/Rdhkyuu/rpg-based-text
