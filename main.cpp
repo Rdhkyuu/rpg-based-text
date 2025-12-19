@@ -27,6 +27,7 @@ const int GREEN = 2;
 const int BRIGHT_AQUA = 11;
 const int BLUE = 1;
 const int BRIGHT_YELLOW = 14;
+const int GREY = 8;
 
 
 
@@ -215,9 +216,8 @@ void playSFX(string namaFile) {
 void tampilMainMenu() {
     system("cls");
     playBGM("bgm_menu.wav");
-    aturWarna(RED); // Merah biar serem
+    aturWarna(RED); 
     
-    // Copy-paste dari website ASCII Generator (Pilih font 'Big' atau 'Doom')
     // Gunakan R"( ... )" (Raw String) biar gak error kena backslash
     cout << R"(
   _____ _____ _       ___  ___  ___  ___ _____  ______ ______________  ___  ___  _____ _   _ 
@@ -339,7 +339,7 @@ int tampilMenuRetry() {
         cin.ignore(1000, '\n'); // Buang input sampah
         opsi = 2; // default jadi kembalian dua aja
     } else {
-        // Bersihkan sisa enter biar aman untuk next loop
+
         cin.ignore(1000, '\n'); 
     }
 
@@ -371,6 +371,12 @@ public:
     }
 
     void healKewarasan(int amount) {
+        aturWarna(GREEN);
+        cout << "(Kewarasan dipulihkan sebesar +" << amount << "%)" << endl;
+        aturWarna(GREY);
+        if(kewarasan >= 100) cout<<"(Kewarasanmu sudah pada batas maksimum!)"<<endl;
+        aturWarna(WHITE);
+
         kewarasan += amount;
         if (kewarasan > 100) kewarasan = 100;
     }
@@ -781,12 +787,15 @@ class Parkiran : public Cerita {
                 playSFX("correct.wav");
                 aturWarna(GREEN);
                 cout << ">> KAMU MENEMUKAN KUNCI GERBANG BESI! <<\n";
+                p->healKewarasan(10);
                 aturWarna(WHITE);
                 resumeBGM();
                 delay(1000);
                 
                 p->adaKunci = true;                        
+                aturWarna(GREY);
                 slowPrint("(Sekarang kamu bisa membuka gerbang di Lorong Kanan!)", 30);
+                aturWarna(WHITE);
                 cout << "\n[Tekan Enter untuk kembali]";
                 cin.ignore(1000, '\n'); cin.get();
                 return new RuangProdi(false);
