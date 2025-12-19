@@ -45,7 +45,7 @@ void slowPrint(string text, int speed = 40) {
 
     for (char c : text) {
         cout << c;
-        delay(0); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
+        delay(speed); //Ubah isi delay ke 0 untuk lebih cepat liat hasil di cmd (Mempercepat liat hasil proses)
     }
     cout << endl;
 }
